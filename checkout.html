@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHOPLY – Kasse</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand"><a href="index.html" style="text-decoration:none;color:inherit">🛒 SHOPLY</a></div>
+  <div class="nav-links">
+    <a href="index.html">Startseite</a>
+    <a href="index.html#produkte">Produkte</a>
+    <div class="cart-wrapper">
+      <button class="cart-icon-btn" onclick="toggleCartDropdown(event)">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+        <span id="cartBadge" class="cart-badge" style="display:none">0</span>
+      </button>
+      <div class="cart-dropdown" id="cartDropdown">
+        <div class="cart-dropdown-header">
+          <h3>🛒 Mein Warenkorb</h3>
+          <span class="cart-count-label" id="cartDropCount">0 Artikel</span>
+        </div>
+        <div class="cart-dropdown-items" id="cartDropItems">
+          <div class="cart-empty-msg">
+            <div class="empty-icon">🛒</div>
+            <p>Dein Warenkorb ist leer</p>
+          </div>
+        </div>
+        <div class="cart-dropdown-footer">
+          <div class="cart-dropdown-total">
+            <span>Gesamtsumme</span>
+            <strong id="cartDropTotal">0,00 €</strong>
+          </div>
+          <a href="checkout.html" class="btn-go-cart">Zum Warenkorb →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="checkout-page">
+  <div class="checkout-container">
+    <div class="checkout-main">
+      <h1>Bestellabschluss</h1>
+
+      <!-- Progress bar – Roach Motel: makes it seem far along -->
+      <div class="checkout-progress">
+        <div class="progress-step active">1. Warenkorb</div>
+        <div class="progress-step active">2. Versand</div>
+        <div class="progress-step current">3. Zahlung</div>
+        <div class="progress-step">4. Bestätigung</div>
+      </div>
+
+      <!-- Cart items -->
+      <div class="checkout-section">
+        <h2>Deine Artikel</h2>
+        <div id="cartItems"></div>
+      </div>
+
+      <!-- Shipping form -->
+      <div class="checkout-section">
+        <h2>Versandadresse</h2>
+        <form id="checkoutForm" action="https://formspree.io/f/xpwdqjkl" method="POST">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Vorname *</label>
+              <input type="text" name="vorname" required>
+            </div>
+            <div class="form-group">
+              <label>Nachname *</label>
+              <input type="text" name="nachname" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>E-Mail *</label>
+            <input type="email" name="email" required>
+            <input type="hidden" name="_subject" value="Neue Bestellung SHOPLY">
+          </div>
+          <div class="form-group">
+            <label>Straße und Hausnummer *</label>
+            <input type="text" name="strasse" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>PLZ *</label>
+              <input type="text" name="plz" required>
+            </div>
+            <div class="form-group">
+              <label>Stadt *</label>
+              <input type="text" name="stadt" required>
+            </div>
+          </div>
+
+          <!-- DARK DEFAULTS: Pre-checked hidden options -->
+          <div class="form-extras">
+            <label class="checkbox-label">
+              <input type="checkbox" name="newsletter" checked>
+              <span>Ja, ich möchte den Newsletter erhalten und exklusive Angebote per E-Mail bekommen</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="partner_offers" checked>
+              <span>Ja, ich möchte personalisierte Angebote von Partnern erhalten (kann ich später deaktivieren)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="analytics_consent" checked>
+              <span>Meine Daten dürfen für Analysezwecke verwendet werden</span>
+            </label>
+          </div>
+
+          <!-- HIDDEN COSTS: Shown only after scrolling -->
+          <div id="hiddenCostsSection" class="hidden-costs-reveal">
+            <h3>Zusätzliche Services</h3>
+            <label class="checkbox-label">
+              <input type="checkbox" name="premium_shipping" id="premShip" onchange="updateTotal()">
+              <span>Premium-Versand mit Versicherung (+4,99 €)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="gift_wrap" id="giftWrap" onchange="updateTotal()">
+              <span>Geschenkverpackung (+3,99 €)</span>
+            </label>
+          </div>
+
+          <!-- FORCED CONTINUITY: Subscription trap -->
+          <div class="subscription-box">
+            <div class="sub-header">
+              <h3>🌟 SHOPLY Premium Mitgliedschaft</h3>
+              <span class="sub-badge">EMPFOHLEN</span>
+            </div>
+            <p>Mit deiner Bestellung erhältst du <strong>30 Tage kostenlosen Zugang</strong> zu SHOPLY Premium!</p>
+            <ul class="sub-benefits">
+              <li>✓ Kostenloser Express-Versand bei jeder Bestellung</li>
+              <li>✓ Exklusive Premium-Rabatte bis zu 80%</li>
+              <li>✓ Früher Zugang zu Flash Sales</li>
+              <li>✓ Persönlicher Einkaufsberater</li>
+            </ul>
+            <div class="sub-choice">
+              <button type="button" class="btn-sub-accept" id="subAccept" onclick="acceptSub()">Ja, ich möchte Premium!</button>
+              <button type="button" class="btn-sub-decline" id="subDecline" onclick="declineSub()">Nein danke</button>
+            </div>
+            <p class="sub-fine-print">* Nach 30 Tagen: 9,99 €/Monat. Kündigung nur telefonisch während der Geschäftszeiten (Mo-Fr 9-17 Uhr) oder per Einschreiben.</p>
+          </div>
+
+          <!-- MISDIRECTION: Big green buy button, tiny back button -->
+          <div class="final-actions">
+            <button type="submit" class="btn-final-buy" onclick="return finalizeOrder()">
+              🔒 Jetzt kostenpflichtig bestellen
+            </button>
+            <a href="index.html" class="back-to-shop">← Zurück zum Shop</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Order summary sidebar -->
+    <div class="checkout-sidebar">
+      <div class="order-summary">
+        <h3>Bestellübersicht</h3>
+        <div id="summaryItems"></div>
+        <div class="summary-line">
+          <span>Zwischensumme</span>
+          <span id="subtotal">0,00 €</span>
+        </div>
+        <div class="summary-line">
+          <span>Versand</span>
+          <span id="shippingCost">Kostenlos</span>
+        </div>
+        <div class="summary-line hidden-fee" id="fee1" style="display:none">
+          <span>Servicegebühr</span>
+          <span>2,99 €</span>
+        </div>
+        <div class="summary-line hidden-fee" id="fee2" style="display:none">
+          <span>Verpackungskosten</span>
+          <span>1,99 €</span>
+        </div>
+        <div class="summary-line hidden-fee" id="fee3" style="display:none">
+          <span>Zahlungsabwicklung</span>
+          <span>0,99 €</span>
+        </div>
+        <div class="summary-line total">
+          <span>Gesamtsumme</span>
+          <span id="totalPrice">0,00 €</span>
+        </div>
+        <p class="tax-hinweis">* Alle Preise inkl. MwSt. Versandkosten und Gebühren werden im nächsten Schritt angezeigt.</p>
+      </div>
+
+      <!-- Urgency in sidebar -->
+      <div class="sidebar-urgency">
+        <p>⏱️ Dein Warenkorb läuft in <span id="cartTimer">14:32</span> ab!</p>
+        <p>👥 <strong>23</strong> Personen haben diese Produkte heute gekauft</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRMSHAMING: Decline subscription modal -->
+<div id="subDeclineModal" class="modal-overlay" style="display:none">
+  <div class="modal exit-modal">
+    <h2>😟 Bist du dir sicher?</h2>
+    <p>Mit SHOPLY Premium sparst du durchschnittlich <strong>47 € pro Monat</strong>. Möchtest du das wirklich verpassen?</p>
+    <div class="sub-modal-benefits">
+      <p>✗ Kein kostenloser Express-Versand</p>
+      <p>✗ Keine exklusiven Premium-Rabatte</p>
+      <p>✗ Kein früher Zugang zu Sales</p>
+      <p>✗ Kein persönlicher Einkaufsberater</p>
+    </div>
+    <button class="btn-stay" onclick="closeSubModal(true)">Doch Premium aktivieren!</button>
+    <a href="#" class="exit-leave" onclick="closeSubModal(false)">Nein, ich bin zu dumm zum Sparen</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-bottom">
+    <p>© 2026 SHOPLY. Alle Rechte vorbehalten.</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="study.js"></script>
+<script>
+// Warenkorb wird bereits von script.js geladen (globale Variable "cart")
+let hiddenFeesAdded = false;
+
+function renderCart() {
+  const container = document.getElementById('cartItems');
+  const summary = document.getElementById('summaryItems');
+  if (cart.length === 0) {
+    container.innerHTML = '<p class="empty-cart">Dein Warenkorb ist leer. <a href="index.html">Zurück zum Shop</a></p>';
+    summary.innerHTML = '';
+    return;
+  }
+  let cartHTML = '';
+  let summaryHTML = '';
+  let total = 0;
+  cart.forEach((item, i) => {
+    total += item.price;
+    cartHTML += `<div class="cart-item">
+      <span class="item-emoji" style="font-size:1.3rem;margin-right:0.5rem">${item.emoji || '📦'}</span>
+      <span style="flex:1">${item.name}</span>
+      <span>${item.price.toFixed(2).replace('.', ',')} €</span>
+      <button class="btn-remove" onclick="removeItem(${i})">✕</button>
+    </div>`;
+    summaryHTML += `<div class="summary-line"><span>${item.emoji || '📦'} ${item.name}</span><span>${item.price.toFixed(2).replace('.', ',')} €</span></div>`;
+  });
+  container.innerHTML = cartHTML;
+  summary.innerHTML = summaryHTML;
+  document.getElementById('subtotal').textContent = total.toFixed(2).replace('.', ',') + ' €';
+  updateTotal(total);
+}
+
+function updateTotal(subtotal) {
+  subtotal = subtotal || cart.reduce((s, i) => s + i.price, 0);
+  let total = subtotal;
+
+  // Add hidden fees progressively
+  if (!hiddenFeesAdded) {
+    hiddenFeesAdded = true;
+    setTimeout(() => {
+      document.getElementById('fee1').style.display = 'flex';
+      total += 2.99;
+      document.getElementById('totalPrice').textContent = total.toFixed(2).replace('.', ',') + ' €';
+    }, 3000);
+    setTimeout(() => {
+      document.getElementById('fee2').style.display = 'flex';
+      total += 1.99;
+      document.getElementById('totalPrice').textContent = total.toFixed(2).replace('.', ',') + ' €';
+    }, 6000);
+    setTimeout(() => {
+      document.getElementById('fee3').style.display = 'flex';
+      total += 0.99;
+      document.getElementById('totalPrice').textContent = total.toFixed(2).replace('.', ',') + ' €';
+    }, 9000);
+  }
+
+  document.getElementById('totalPrice').textContent = total.toFixed(2).replace('.', ',') + ' €';
+}
+
+function removeItem(index) {
+  trackInteraction('cart_remove', { item: cart[index].name });
+  cart.splice(index, 1);
+  localStorage.setItem('shoply_cart', JSON.stringify(cart));
+  renderCart();
+  updateNavCart();
+}
+
+function acceptSub() {
+  trackInteraction('subscription_accepted', {});
+  document.getElementById('subAccept').textContent = '✓ Premium aktiviert!';
+  document.getElementById('subAccept').classList.add('activated');
+  document.getElementById('subDecline').style.display = 'none';
+}
+
+function declineSub() {
+  trackInteraction('subscription_decline_click', {});
+  document.getElementById('subDeclineModal').style.display = 'flex';
+}
+
+function closeSubModal(reconsider) {
+  document.getElementById('subDeclineModal').style.display = 'none';
+  if (reconsider) {
+    acceptSub();
+  } else {
+    trackInteraction('subscription_declined_final', {});
+  }
+}
+
+function finalizeOrder() {
+  trackInteraction('order_finalize', { items: cart.map(i => i.name), total: document.getElementById('totalPrice').textContent });
+
+  // STUDIE: für jedes der 6 Hauptprodukte im Warenkorb ein "purchase"-Event senden
+  if (typeof trackStudyEvent === 'function') {
+    cart.forEach(function (item) {
+      if (item.productId) {
+        trackStudyEvent('purchase', item.productId, { price: item.price, name: item.name });
+      }
+    });
+  }
+
+  // Form submits to Formspree
+  return true;
+}
+
+// Cart timer
+let cartTime = 14 * 60 + 32;
+setInterval(() => {
+  cartTime--;
+  if (cartTime < 0) cartTime = 15 * 60;
+  const m = Math.floor(cartTime / 60);
+  const s = cartTime % 60;
+  document.getElementById('cartTimer').textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}, 1000);
+
+renderCart();
+updateNavCart();
+</script>
+</body>
+</html>

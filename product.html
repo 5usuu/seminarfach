@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHOPLY – Produkt</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand"><a href="index.html" style="text-decoration:none;color:inherit">🛒 SHOPLY</a></div>
+  <div class="nav-links">
+    <a href="index.html">Startseite</a>
+    <a href="index.html#produkte">Produkte</a>
+    <div class="cart-wrapper">
+      <button class="cart-icon-btn" onclick="toggleCartDropdown(event)">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+        </svg>
+        <span id="cartBadge" class="cart-badge" style="display:none">0</span>
+      </button>
+      <div class="cart-dropdown" id="cartDropdown">
+        <div class="cart-dropdown-header">
+          <h3>🛒 Mein Warenkorb</h3>
+          <span class="cart-count-label" id="cartDropCount">0 Artikel</span>
+        </div>
+        <div class="cart-dropdown-items" id="cartDropItems">
+          <div class="cart-empty-msg">
+            <div class="empty-icon">🛒</div>
+            <p>Dein Warenkorb ist leer</p>
+          </div>
+        </div>
+        <div class="cart-dropdown-footer">
+          <div class="cart-dropdown-total">
+            <span>Gesamtsumme</span>
+            <strong id="cartDropTotal">0,00 €</strong>
+          </div>
+          <a href="checkout.html" class="btn-go-cart">Zum Warenkorb →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="nav-right">
+    <span class="nav-social-proof">👥 <strong>47</strong> Personen shoppen gerade</span>
+  </div>
+</nav>
+
+<div class="product-detail-page">
+  <div class="product-detail-container">
+    <div class="product-detail-image" id="pdImage">🎧</div>
+    <div class="product-detail-info">
+      <span class="product-badge" id="pdBadge">BESTSELLER</span>
+      <h1 id="pdName">Premium Kopfhörer X1</h1>
+      <div class="product-rating" id="pdRating">★★★★★ <span>(4.9 – 2.341 Bewertungen)</span></div>
+      <div class="product-price" id="pdPrice">
+        <span class="old-price">199,99 €</span>
+        <span class="new-price">59,99 €</span>
+        <span class="discount">-70%</span>
+      </div>
+      <p class="product-desc" id="pdDesc">Hochwertige Noise-Cancelling Kopfhörer mit 40h Akkulaufzeit.</p>
+
+      <!-- FAKE PRICE INFLATION: higher UVP -->
+      <div class="price-inflated" id="pdInflated" style="display:none">
+        <span class="inflated-label">UVP:</span>
+        <span class="inflated-price" id="pdUvp"></span>
+        <span class="inflated-you-save" id="pdYouSave"></span>
+      </div>
+
+      <div class="product-stock-low" id="pdStock">⚠️ Nur noch 3 auf Lager!</div>
+      <div class="product-social" id="pdSocial">👥 127 Personen schauen sich dieses Produkt an</div>
+      <div class="product-timer" id="pdTimer">⏱️ Deal endet in <span class="product-countdown">02:14:33</span></div>
+
+      <!-- LIVE SALES COUNTER (#6) -->
+      <div class="live-sales-counter" id="liveSalesCounter" style="display:none">
+        <span class="fire-icon">🔥</span>
+        <span><span class="counter-num" id="liveSalesCount">37</span>x in den letzten 24 Stunden verkauft</span>
+      </div>
+
+      <!-- QUANTITY SELECTOR (#2) -->
+      <div class="qty-selector">
+        <label>Menge:</label>
+        <div class="qty-controls">
+          <button onclick="changeQty(-1)">−</button>
+          <input type="number" id="qtyInput" value="2" min="1" max="99" onchange="setQty(parseInt(this.value)||1)">
+          <button onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+
+      <!-- MISDIRECTION: Big add-to-cart, tiny skip -->
+      <div class="purchase-actions">
+        <button class="btn-buy-now" onclick="buyNow()">🛒 IN DEN WARENKORB</button>
+        <button class="btn-buy-direct" onclick="buyDirect()">⚡ JETZT KAUFEN</button>
+        <a href="index.html" class="skip-link">← Zurück zur Übersicht</a>
+      </div>
+
+      <!-- DARK DEFAULTS: Pre-checked extras -->
+      <div class="extras-section">
+        <h4>Empfohlene Erweiterungen</h4>
+        <label class="extra-option">
+          <input type="checkbox" id="extra1" checked onchange="trackExtra('Premium Garantie (+19,99 €)', this.checked)">
+          <span>Premium Garantie (+19,99 €) – <em>Empfohlen!</em></span>
+        </label>
+        <label class="extra-option">
+          <input type="checkbox" id="extra2" checked onchange="trackExtra('Express Versand (+9,99 €)', this.checked)">
+          <span>Express Versand (+9,99 €) – <em>Am beliebtesten</em></span>
+        </label>
+        <label class="extra-option">
+          <input type="checkbox" id="extra3" onchange="trackExtra('Schutzfolie Set (+14,99 €)', this.checked)">
+          <span>Schutzfolie Set (+14,99 €)</span>
+        </label>
+        <label class="extra-option">
+          <input type="checkbox" id="extra4" checked onchange="trackExtra('Newsletter (+0,00 €)', this.checked)">
+          <span>Newsletter abonnieren (+0,00 €)</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- CROSS SELL / FREQUENTLY BOUGHT TOGETHER (#3) -->
+  <div class="cross-sell-section" id="crossSellSection">
+    <h3>🤝 Kunden, die dieses Produkt gekauft haben, kauften auch</h3>
+    <div class="cross-sell-grid" id="crossSellGrid"></div>
+    <div class="cross-sell-bundle">
+      <p>📦 Zusammen kaufen und <strong>sparen</strong>!</p>
+      <div class="bundle-price" id="bundlePrice">Gesamt: 159,98 €</div>
+      <button class="btn-bundle" onclick="addBundleToCart(currentProductId)">Alle in den Warenkorb</button>
+    </div>
+  </div>
+
+  <!-- BAIT AND SWITCH -->
+  <div class="bait-section">
+    <h3>🎁 Exklusives Angebot: SHOPLY Premium kostenlos testen!</h3>
+    <p>Erhalte 30 Tage kostenlosen Zugang zu SHOPLY Premium mit kostenloser Lieferung, exklusiven Rabatten und frühem Zugang zu Sales.</p>
+    <div class="bait-actions">
+      <button class="btn-bait-yes" onclick="acceptPremium()">Ja, ich möchte 30 Tage kostenlos testen!</button>
+      <a href="#" class="btn-bait-no" onclick="declinePremium(event)">Nein, ich möchte keine Vorteile</a>
+    </div>
+    <p class="bait-fine-print">* Nach 30 Tagen wird die Mitgliedschaft automatisch für 9,99 €/Monat verlängert. Jederzeit kündbar... über unseren Kundenservice (Mo-Fr 9-17 Uhr, Wartezeit ca. 25 Min).</p>
+  </div>
+
+  <!-- REVIEWS -->
+  <div class="reviews-section">
+    <h3>Kundenbewertungen</h3>
+    <div class="review-summary">
+      <div class="review-big-rating">4.9</div>
+      <div>
+        <div class="testimonial-stars">★★★★★</div>
+        <p>Basierend auf 2.341 Bewertungen</p>
+      </div>
+    </div>
+    <div class="review">
+      <div class="review-header">
+        <strong>Sarah M.</strong>
+        <span class="verified">✓ Verifizierter Kauf</span>
+        <span class="testimonial-stars">★★★★★</span>
+      </div>
+      <p>"Einfach fantastisch! Die Klangqualität ist unglaublich und das Design ist super. Hätte ich nie zu diesem Preis erwartet. Absolute Empfehlung!"</p>
+      <span class="review-date">vor 2 Tagen</span>
+    </div>
+    <div class="review">
+      <div class="review-header">
+        <strong>Michael T.</strong>
+        <span class="verified">✓ Verifizierter Kauf</span>
+        <span class="testimonial-stars">★★★★★</span>
+      </div>
+      <p>"Mein Bruder hat mir diesen Shop empfohlen und ich muss sagen – Top! Lieferung war schnell und die Qualität übertrifft alle Erwartungen."</p>
+      <span class="review-date">vor 5 Tagen</span>
+    </div>
+    <div class="review">
+      <div class="review-header">
+        <strong>Lisa K.</strong>
+        <span class="verified">✓ Verifizierter Kauf</span>
+        <span class="testimonial-stars">★★★★★</span>
+      </div>
+      <p>"Ich habe schon viele Kopfhörer ausprobiert, aber diese sind mit Abstand die Besten. Noise-Cancelling funktioniert perfekt!"</p>
+      <span class="review-date">vor 1 Woche</span>
+    </div>
+  </div>
+</div>
+
+<!-- RECENTLY VIEWED (#4) -->
+<section class="recently-viewed-section" id="recentlyViewedSection">
+  <h3>🕐 Kürzlich angesehene Produkte</h3>
+  <div class="recently-viewed-grid" id="recentlyViewed"></div>
+</section>
+
+<!-- STICKY ADD-TO-CART BAR (#1) -->
+<div class="sticky-cart-bar" id="stickyCartBar">
+  <div class="sticky-info">
+    <span class="sticky-emoji" id="stickyEmoji">🎧</span>
+    <div>
+      <div class="sticky-name" id="stickyName">Premium Kopfhörer X1</div>
+      <div class="sticky-price">
+        <span class="sticky-old" id="stickyOld">199,99 €</span>
+        <span class="sticky-new" id="stickyNew">59,99 €</span>
+      </div>
+    </div>
+  </div>
+  <div class="sticky-actions">
+    <div class="sticky-qty">
+      <button onclick="changeQty(-1)">−</button>
+      <span id="stickyQty">2</span>
+      <button onclick="changeQty(1)">+</button>
+    </div>
+    <button class="btn-sticky-cart" onclick="buyNow()">🛒 In den Warenkorb</button>
+    <button class="btn-sticky-cart" onclick="buyDirect()" style="background:var(--dark)">⚡ Jetzt kaufen</button>
+  </div>
+</div>
+
+<!-- CONFIRMSHAMING EXIT MODAL -->
+<div id="exitModal" class="modal-overlay" style="display:none">
+  <div class="modal exit-modal">
+    <h2>😢 Willst du wirklich gehen?</h2>
+    <p>Du bist nur einen Klick entfernt von dem besten Deal deines Lebens.</p>
+    <p class="exit-stats">⚠️ <strong>3</strong> andere Personen schauen sich gerade dieselbe Seite an. Wenn du gehst, verpasst du dieses Angebot möglicherweise für immer.</p>
+    <button class="btn-stay" onclick="closeExitModal()">Nein, ich bleibe und kaufe!</button>
+    <a href="index.html" class="exit-leave">Ja, ich möchte mein Glück nicht versuchen und das Angebot verpassen</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-bottom">
+    <p>© 2026 SHOPLY. Alle Rechte vorbehalten.</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="study.js"></script>
+<script>
+// Product data – FAKE PRICE INFLATION (#5): uvp is ~50% higher than oldPrice
+const products = {
+  kopfhoerer: { name: "Premium Kopfhörer X1", image: "🎧", badge: "BESTSELLER", rating: '★★★★★ <span>(4.9 – 2.341 Bewertungen)</span>', oldPrice: "199,99 €", newPrice: "59,99 €", uvp: "299,99 €", discount: "-80%", realDiscount: "-70%", desc: "Hochwertige Noise-Cancelling Kopfhörer mit 40h Akkulaufzeit. Perfekt für Musikliebhaber.", stock: "⚠️ Nur noch 3 auf Lager!", social: "👥 127 Personen schauen sich dieses Produkt an" },
+  smartwatch: { name: "Smart Watch Pro", image: "⌚", badge: "🔥 HEISS", rating: '★★★★☆ <span>(4.7 – 1.892 Bewertungen)</span>', oldPrice: "349,99 €", newPrice: "99,99 €", uvp: "499,99 €", discount: "-80%", realDiscount: "-71%", desc: "Die ultimative Smartwatch mit GPS, Herzfrequenzmesser und 7 Tagen Akkulaufzeit.", stock: "⚠️ Nur noch 1 auf Lager!", social: "👥 89 Personen schauen sich dieses Produkt an" },
+  tasche: { name: "Leder Tasche Deluxe", image: "👜", badge: "NEU", rating: '★★★★★ <span>(4.8 – 967 Bewertungen)</span>', oldPrice: "249,99 €", newPrice: "79,99 €", uvp: "379,99 €", discount: "-80%", realDiscount: "-68%", desc: "Handgefertigte Lederhochtasche aus italienischem Leder. Zeitlos elegant.", stock: "⚠️ Nur noch 5 auf Lager!", social: "👥 53 Personen schauen sich dieses Produkt an" },
+  maus: { name: "Gaming Maus RGB Pro", image: "🖱️", badge: "BESTSELLER", rating: '★★★★☆ <span>(4.6 – 3.102 Bewertungen)</span>', oldPrice: "89,99 €", newPrice: "29,99 €", uvp: "139,99 €", discount: "-78%", realDiscount: "-67%", desc: "Präzise Gaming-Maus mit 16.000 DPI, RGB-Beleuchtung und ergonomischem Design.", stock: "⚠️ Nur noch 2 auf Lager!", social: "👥 201 Personen schauen sich dieses Produkt an" },
+  sneaker: { name: "Sneaker Limited Edition", image: "👟", badge: "🔥 LIMITIERT", rating: '★★★★★ <span>(4.9 – 743 Bewertungen)</span>', oldPrice: "179,99 €", newPrice: "54,99 €", uvp: "259,99 €", discount: "-80%", realDiscount: "-70%", desc: "Exklusive Limited-Edition-Sneaker. Nur 500 Paar weltweit. Sammlerstück!", stock: "⚠️ Nur noch 1 auf Lager!", social: "👥 312 Personen schauen sich dieses Produkt an" },
+  rueckwand: { name: "Premium Rückwand 40L", image: "🎒", badge: "NEU", rating: '★★★★☆ <span>(4.5 – 1.234 Bewertungen)</span>', oldPrice: "129,99 €", newPrice: "39,99 €", uvp: "199,99 €", discount: "-80%", realDiscount: "-69%", desc: "Wasserdichter Trekkingrucksack mit Laptop-Fach und USB-Ladeport.", stock: "⚠️ Nur noch 4 auf Lager!", social: "👥 67 Personen schauen sich dieses Produkt an" }
+};
+
+var currentProductId;
+const params = new URLSearchParams(window.location.search);
+const productId = params.get('id') || 'kopfhoerer';
+currentProductId = productId;
+const p = products[productId] || products.kopfhoerer;
+window.__shoplyCurrentProduct = p;
+
+document.getElementById('pdImage').textContent = p.image;
+document.getElementById('pdName').textContent = p.name;
+document.getElementById('pdBadge').textContent = p.badge;
+document.getElementById('pdRating').innerHTML = p.rating;
+
+// FAKE PRICE INFLATION (#5): show inflated UVP
+document.getElementById('pdPrice').innerHTML = `<span class="old-price">${p.uvp}</span><span class="new-price">${p.newPrice}</span><span class="discount">${p.discount}</span>`;
+document.getElementById('pdInflated').style.display = 'block';
+document.getElementById('pdUvp').textContent = p.uvp;
+const oldNum = parseFloat(p.oldPrice.replace(' €','').replace(',','.'));
+const newNum = parseFloat(p.newPrice.replace(' €','').replace(',','.'));
+const saved = (oldNum - newNum).toFixed(2).replace('.',',');
+document.getElementById('pdYouSave').textContent = `Du sparst ${saved} €`;
+
+document.getElementById('pdDesc').textContent = p.desc;
+document.getElementById('pdStock').textContent = p.stock;
+document.getElementById('pdSocial').textContent = p.social;
+document.title = "SHOPLY – " + p.name;
+
+// STICKY BAR populate
+document.getElementById('stickyEmoji').textContent = p.image;
+document.getElementById('stickyName').textContent = p.name;
+document.getElementById('stickyOld').textContent = p.uvp;
+document.getElementById('stickyNew').textContent = p.newPrice;
+
+// LIVE COUNTER init
+document.getElementById('liveSalesCounter').style.display = 'flex';
+startLiveCounter();
+
+// STUDIE: Dark-Pattern-Elemente entfernen, falls diese Person für
+// dieses Produkt die "normale" (ehrliche) Variante sehen soll
+applyVariantToProductDetail(productId);
+trackStudyEvent('view_product', productId);
+
+// CROSS SELL populate (#3)
+function populateCrossSell() {
+  const csData = CROSS_SELL_DATA[productId];
+  const grid = document.getElementById('crossSellGrid');
+  if (!csData || !grid) { document.getElementById('crossSellSection').style.display='none'; return; }
+
+  let bundleTotal = parseFloat(p.newPrice.replace(' €','').replace(',','.'));
+  let html = '';
+  csData.forEach(function(cs) {
+    html += `
+      <div class="cross-sell-card" data-name="${cs.name}" data-price="${cs.price}" data-emoji="${cs.emoji}" onclick="toggleCrossSell(this)">
+        <div class="cs-check">✓</div>
+        <div class="cs-emoji">${cs.emoji}</div>
+        <div class="cs-name">${cs.name}</div>
+        <div class="cs-price">${cs.price.toFixed(2).replace('.',',')} €</div>
+        <div class="cs-old">${cs.oldPrice}</div>
+      </div>`;
+    bundleTotal += cs.price;
+  });
+  grid.innerHTML = html;
+  document.getElementById('bundlePrice').textContent = 'Gesamt: ' + bundleTotal.toFixed(2).replace('.',',') + ' €';
+}
+populateCrossSell();
+
+// RECENTLY VIEWED track + render (#4)
+trackRecentlyViewed(productId, p.name, p.newPrice.replace(' €',''), p.image);
+renderRecentlyViewed();
+
+// INIT sticky bar (#1)
+initStickyBar();
+
+function buyNow() {
+  const qty = selectedQty;
+  const pricePer = parseFloat(p.newPrice.replace(' €','').replace(',','.'));
+  trackInteraction('add_to_cart_detail', { product: productId, qty: qty, price: pricePer });
+  // Add the item qty times to cart
+  for (var i = 0; i < qty; i++) {
+    addToCart(p.name, pricePer, p.image, productId);
+  }
+  document.getElementById('stickyQty').textContent = selectedQty;
+}
+
+function buyDirect() {
+  trackInteraction('buy_direct_click', { product: productId, qty: selectedQty });
+  // Add to cart then go to checkout
+  const pricePer = parseFloat(p.newPrice.replace(' €','').replace(',','.'));
+  for (var i = 0; i < selectedQty; i++) {
+    addToCart(p.name, pricePer, p.image, productId);
+  }
+  window.location.href = 'checkout.html';
+}
+
+// Sync sticky qty display with main qty selector
+var origChangeQty = changeQty;
+changeQty = function(delta) {
+  origChangeQty(delta);
+  document.getElementById('stickyQty').textContent = selectedQty;
+};
+
+function acceptPremium() {
+  trackInteraction('premium_accept', { product: productId });
+  alert("Willkommen bei SHOPLY Premium!");
+}
+
+function declinePremium(e) {
+  e.preventDefault();
+  trackInteraction('premium_decline', { product: productId });
+  if (confirm("Bist du sicher? Du verlierst damit kostenlosen Versand, exklusive Rabatte und Early-Access zu allen Sales.")) {
+    alert("Schade. Du kannst Premium jederzeit wieder aktivieren... wenn du es schaffst, die versteckte Option zu finden.");
+  }
+}
+
+function trackExtra(name, checked) {
+  trackInteraction('extra_toggle', { name: name, checked: checked });
+}
+
+// Exit intent modal
+document.addEventListener('mouseout', function(e) {
+  if (window.__shoplyStudyNoExitModal) return; // Studie: "saubere" Variante zeigt kein Confirmshaming-Popup
+  if (!e.toElement && !e.relatedTarget && e.clientY < 10) {
+    document.getElementById('exitModal').style.display = 'flex';
+    trackInteraction('exit_intent_shown', { product: productId });
+  }
+});
+
+function closeExitModal() {
+  document.getElementById('exitModal').style.display = 'none';
+  trackInteraction('exit_modal_stay', { product: productId });
+}
+</script>
+</body>
+</html>
