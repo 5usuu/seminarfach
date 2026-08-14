@@ -46,7 +46,7 @@
    ============================================================ */
 
 // TODO: Nach dem Setup (siehe oben) hier die eigene Apps-Script-Web-App-URL eintragen
-const STUDY_ENDPOINT = 'https://docs.google.com/spreadsheets/d/1fuz68oBevx2I7kyII471R4FEIxS7tltaVObTa6fSaqk/edit?usp=sharing';
+const STUDY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxdzhbbq-xcbSA5AwcmCwE2u66EzABJyRPYSCz3uIAjckohn1LpnaqsBMBjKc6W7AFi/exec';
 
 // Die 6 Hauptprodukte, die Teil der Studie sind (müssen zu den
 // data-product-Attributen in index.html / den IDs in product.html passen)
