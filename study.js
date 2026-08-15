@@ -98,7 +98,10 @@ function showMonthPicker() {
   document.body.appendChild(overlay);
   overlay.querySelectorAll('.month-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
-      localStorage.setItem('shoply_study_id', 'monat-' + this.dataset.month);
+      const month = this.dataset.month;
+      const logCode = Math.random().toString(36).slice(2, 6).toUpperCase(); // z.B. "K7F2"
+      localStorage.setItem('shoply_study_month', month);
+      localStorage.setItem('shoply_study_id', 'monat-' + month + '-' + logCode);
       window.location.reload();
     });
   });
@@ -115,7 +118,11 @@ if (needsMonthPicker()) {
   }
 }
 
-/* ---------- Kennung ermitteln (Geburtsmonat-Overlay ODER manueller ?s=...-Override) ---------- */
+/* ---------- Kennung ermitteln (Geburtsmonat-Overlay ODER manueller ?s=...-Override) ----------
+   STUDY_ID  = eindeutige Anzeige-Kennung fürs Sheet (z.B. "monat-5-K7F2")
+   STUDY_KEY = Zuordnungs-Schlüssel, der bestimmt, welche Produkte manipuliert
+               sind (nur der Monat, damit alle in derselben Gruppe dieselbe
+               Zuordnung sehen – siehe isManipulated) */
 function getStudentId() {
   const params = new URLSearchParams(window.location.search);
   const fromUrl = params.get('s');
@@ -126,7 +133,15 @@ function getStudentId() {
   return localStorage.getItem('shoply_study_id') || 'unbekannt';
 }
 
+function getStudentKey() {
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = params.get('s');
+  if (fromUrl) return fromUrl; // manueller Override: Zuordnung direkt über die übergebene Kennung
+  return localStorage.getItem('shoply_study_month') || STUDY_ID;
+}
+
 const STUDY_ID = getStudentId();
+const STUDY_KEY = getStudentKey();
 
 /* ---------- Deterministische Varianten-Zuordnung ---------- */
 function hashString(str) {
@@ -141,7 +156,7 @@ function hashString(str) {
 // true = für diese Person wird das Produkt MIT Dark Patterns gezeigt (Standard im HTML)
 // false = für diese Person wird das Produkt in der ehrlichen "Normal"-Variante gezeigt
 function isManipulated(productId) {
-  return hashString(STUDY_ID + ':' + productId) % 2 === 0;
+  return hashString(STUDY_KEY + ':' + productId) % 2 === 0;
 }
 
 /* ---------- Events an das Google Sheet senden ---------- */
