@@ -12,7 +12,7 @@
       (localStorage), man muss sie also nicht auf jeder Unterseite
       erneut anhängen.
 
-   2. Für JEDES der 6 Hauptprodukte wird aus der Schüler-Kennung
+   2. Für JEDES Hauptprodukt (siehe products.js) wird aus der Schüler-Kennung
       deterministisch (aber für Außenstehende nicht vorhersagbar)
       berechnet, ob es bei dieser Person "manipuliert" (mit Dark
       Patterns) oder "normal" (ehrliche Darstellung) angezeigt
@@ -46,11 +46,14 @@
    ============================================================ */
 
 // TODO: Nach dem Setup (siehe oben) hier die eigene Apps-Script-Web-App-URL eintragen
-const STUDY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxdzhbbq-xcbSA5AwcmCwE2u66EzABJyRPYSCz3uIAjckohn1LpnaqsBMBjKc6W7AFi/exec';
+const STUDY_ENDPOINT = 'HIER_DEINE_APPS_SCRIPT_WEB_APP_URL_EINFUEGEN';
 
-// Die 6 Hauptprodukte, die Teil der Studie sind (müssen zu den
-// data-product-Attributen in index.html / den IDs in product.html passen)
-const STUDY_PRODUCTS = ['kopfhoerer', 'smartwatch', 'tasche', 'maus', 'sneaker', 'rueckwand'];
+// Die Hauptprodukte, die Teil der Studie sind – wird automatisch aus
+// products.js übernommen (dort einfach neue Produkte ergänzen, sie werden
+// dann automatisch mit in die Studie aufgenommen).
+const STUDY_PRODUCTS = (typeof PRODUCTS !== 'undefined')
+  ? PRODUCTS.map(p => p.id)
+  : ['kopfhoerer', 'smartwatch', 'tasche', 'maus', 'sneaker', 'rueckwand'];
 
 /* ---------- Schüler-Kennung ermitteln & merken ---------- */
 function getStudentId() {

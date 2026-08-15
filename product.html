@@ -78,6 +78,12 @@
         <span><span class="counter-num" id="liveSalesCount">37</span>x in den letzten 24 Stunden verkauft</span>
       </div>
 
+      <!-- FARBAUSWAHL -->
+      <div class="color-selector" id="colorSelector">
+        <label>Farbe: <span id="selectedColorLabel"></span></label>
+        <div class="color-swatches" id="pdColorSwatches"></div>
+      </div>
+
       <!-- QUANTITY SELECTOR (#2) -->
       <div class="qty-selector">
         <label>Menge:</label>
@@ -226,18 +232,14 @@
   </div>
 </footer>
 
+<script src="products.js"></script>
 <script src="script.js"></script>
 <script src="study.js"></script>
 <script>
-// Product data – FAKE PRICE INFLATION (#5): uvp is ~50% higher than oldPrice
-const products = {
-  kopfhoerer: { name: "Premium Kopfhörer X1", image: "🎧", badge: "BESTSELLER", rating: '★★★★★ <span>(4.9 – 2.341 Bewertungen)</span>', oldPrice: "199,99 €", newPrice: "59,99 €", uvp: "299,99 €", discount: "-80%", realDiscount: "-70%", desc: "Hochwertige Noise-Cancelling Kopfhörer mit 40h Akkulaufzeit. Perfekt für Musikliebhaber.", stock: "⚠️ Nur noch 3 auf Lager!", social: "👥 127 Personen schauen sich dieses Produkt an" },
-  smartwatch: { name: "Smart Watch Pro", image: "⌚", badge: "🔥 HEISS", rating: '★★★★☆ <span>(4.7 – 1.892 Bewertungen)</span>', oldPrice: "349,99 €", newPrice: "99,99 €", uvp: "499,99 €", discount: "-80%", realDiscount: "-71%", desc: "Die ultimative Smartwatch mit GPS, Herzfrequenzmesser und 7 Tagen Akkulaufzeit.", stock: "⚠️ Nur noch 1 auf Lager!", social: "👥 89 Personen schauen sich dieses Produkt an" },
-  tasche: { name: "Leder Tasche Deluxe", image: "👜", badge: "NEU", rating: '★★★★★ <span>(4.8 – 967 Bewertungen)</span>', oldPrice: "249,99 €", newPrice: "79,99 €", uvp: "379,99 €", discount: "-80%", realDiscount: "-68%", desc: "Handgefertigte Lederhochtasche aus italienischem Leder. Zeitlos elegant.", stock: "⚠️ Nur noch 5 auf Lager!", social: "👥 53 Personen schauen sich dieses Produkt an" },
-  maus: { name: "Gaming Maus RGB Pro", image: "🖱️", badge: "BESTSELLER", rating: '★★★★☆ <span>(4.6 – 3.102 Bewertungen)</span>', oldPrice: "89,99 €", newPrice: "29,99 €", uvp: "139,99 €", discount: "-78%", realDiscount: "-67%", desc: "Präzise Gaming-Maus mit 16.000 DPI, RGB-Beleuchtung und ergonomischem Design.", stock: "⚠️ Nur noch 2 auf Lager!", social: "👥 201 Personen schauen sich dieses Produkt an" },
-  sneaker: { name: "Sneaker Limited Edition", image: "👟", badge: "🔥 LIMITIERT", rating: '★★★★★ <span>(4.9 – 743 Bewertungen)</span>', oldPrice: "179,99 €", newPrice: "54,99 €", uvp: "259,99 €", discount: "-80%", realDiscount: "-70%", desc: "Exklusive Limited-Edition-Sneaker. Nur 500 Paar weltweit. Sammlerstück!", stock: "⚠️ Nur noch 1 auf Lager!", social: "👥 312 Personen schauen sich dieses Produkt an" },
-  rueckwand: { name: "Premium Rückwand 40L", image: "🎒", badge: "NEU", rating: '★★★★☆ <span>(4.5 – 1.234 Bewertungen)</span>', oldPrice: "129,99 €", newPrice: "39,99 €", uvp: "199,99 €", discount: "-80%", realDiscount: "-69%", desc: "Wasserdichter Trekkingrucksack mit Laptop-Fach und USB-Ladeport.", stock: "⚠️ Nur noch 4 auf Lager!", social: "👥 67 Personen schauen sich dieses Produkt an" }
-};
+// Product data – kommt jetzt zentral aus products.js (PRODUCTS),
+// hier nur noch ins von dieser Seite erwartete Format umgewandelt
+const products = {};
+PRODUCTS.forEach(function (x) { products[x.id] = productToDetailShape(x); });
 
 var currentProductId;
 const params = new URLSearchParams(window.location.search);
@@ -265,6 +267,31 @@ document.getElementById('pdStock').textContent = p.stock;
 document.getElementById('pdSocial').textContent = p.social;
 document.title = "SHOPLY – " + p.name;
 
+// FARBAUSWAHL
+let selectedColor = (p.colors && p.colors[0]) || 'schwarz';
+window.__shoplySelectedColor = selectedColor;
+function renderColorSwatches() {
+  const wrap = document.getElementById('pdColorSwatches');
+  if (!wrap || !p.colors) return;
+  wrap.innerHTML = p.colors.map(function (cid) {
+    const c = colorById(cid);
+    const active = cid === selectedColor ? ' active' : '';
+    return '<button type="button" class="color-swatch' + active + '" style="background:' + c.hex +
+      '" title="' + c.name + '" onclick="selectDetailColor(\'' + cid + '\')"></button>';
+  }).join('');
+  const labelEl = document.getElementById('selectedColorLabel');
+  if (labelEl) labelEl.textContent = colorById(selectedColor).name;
+}
+function selectDetailColor(cid) {
+  selectedColor = cid;
+  window.__shoplySelectedColor = cid;
+  renderColorSwatches();
+  const imgEl = document.getElementById('pdImage');
+  if (imgEl) imgEl.style.background = colorTint(cid);
+}
+renderColorSwatches();
+document.getElementById('pdImage').style.background = colorTint(selectedColor);
+
 // STICKY BAR populate
 document.getElementById('stickyEmoji').textContent = p.image;
 document.getElementById('stickyName').textContent = p.name;
@@ -278,7 +305,7 @@ startLiveCounter();
 // STUDIE: Dark-Pattern-Elemente entfernen, falls diese Person für
 // dieses Produkt die "normale" (ehrliche) Variante sehen soll
 applyVariantToProductDetail(productId);
-trackStudyEvent('view_product', productId);
+trackStudyEvent('view_product', productId, { color: selectedColor });
 
 // CROSS SELL populate (#3)
 function populateCrossSell() {
@@ -314,20 +341,20 @@ initStickyBar();
 function buyNow() {
   const qty = selectedQty;
   const pricePer = parseFloat(p.newPrice.replace(' €','').replace(',','.'));
-  trackInteraction('add_to_cart_detail', { product: productId, qty: qty, price: pricePer });
+  trackInteraction('add_to_cart_detail', { product: productId, qty: qty, price: pricePer, color: selectedColor });
   // Add the item qty times to cart
   for (var i = 0; i < qty; i++) {
-    addToCart(p.name, pricePer, p.image, productId);
+    addToCart(p.name, pricePer, p.image, productId, selectedColor);
   }
   document.getElementById('stickyQty').textContent = selectedQty;
 }
 
 function buyDirect() {
-  trackInteraction('buy_direct_click', { product: productId, qty: selectedQty });
+  trackInteraction('buy_direct_click', { product: productId, qty: selectedQty, color: selectedColor });
   // Add to cart then go to checkout
   const pricePer = parseFloat(p.newPrice.replace(' €','').replace(',','.'));
   for (var i = 0; i < selectedQty; i++) {
-    addToCart(p.name, pricePer, p.image, productId);
+    addToCart(p.name, pricePer, p.image, productId, selectedColor);
   }
   window.location.href = 'checkout.html';
 }

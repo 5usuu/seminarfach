@@ -232,6 +232,7 @@
   </div>
 </footer>
 
+<script src="products.js"></script>
 <script src="script.js"></script>
 <script src="study.js"></script>
 <script>
@@ -251,13 +252,14 @@ function renderCart() {
   let total = 0;
   cart.forEach((item, i) => {
     total += item.price;
+    const colorLabel = (item.color && typeof colorById === 'function') ? ` <small style="color:var(--text-muted)">(${colorById(item.color).name})</small>` : '';
     cartHTML += `<div class="cart-item">
       <span class="item-emoji" style="font-size:1.3rem;margin-right:0.5rem">${item.emoji || '📦'}</span>
-      <span style="flex:1">${item.name}</span>
+      <span style="flex:1">${item.name}${colorLabel}</span>
       <span>${item.price.toFixed(2).replace('.', ',')} €</span>
       <button class="btn-remove" onclick="removeItem(${i})">✕</button>
     </div>`;
-    summaryHTML += `<div class="summary-line"><span>${item.emoji || '📦'} ${item.name}</span><span>${item.price.toFixed(2).replace('.', ',')} €</span></div>`;
+    summaryHTML += `<div class="summary-line"><span>${item.emoji || '📦'} ${item.name}${colorLabel}</span><span>${item.price.toFixed(2).replace('.', ',')} €</span></div>`;
   });
   container.innerHTML = cartHTML;
   summary.innerHTML = summaryHTML;
@@ -328,7 +330,7 @@ function finalizeOrder() {
   if (typeof trackStudyEvent === 'function') {
     cart.forEach(function (item) {
       if (item.productId) {
-        trackStudyEvent('purchase', item.productId, { price: item.price, name: item.name });
+        trackStudyEvent('purchase', item.productId, { price: item.price, name: item.name, color: item.color || null });
       }
     });
   }

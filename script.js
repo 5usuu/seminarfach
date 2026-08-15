@@ -13,15 +13,15 @@ function saveCart() {
   localStorage.setItem('shoply_cart', JSON.stringify(cart));
 }
 
-function addToCart(name, price, emoji, productId) {
-  cart.push({ name: name, price: price, emoji: emoji, productId: productId || null });
+function addToCart(name, price, emoji, productId, color) {
+  cart.push({ name: name, price: price, emoji: emoji, productId: productId || null, color: color || null });
   saveCart();
   updateNavCart();
-  trackInteraction('add_to_cart', { name: name, price: price, productId: productId });
+  trackInteraction('add_to_cart', { name: name, price: price, productId: productId, color: color });
   // Studien-Tracking (siehe study.js): nur, wenn eine Produkt-ID übergeben wurde,
-  // also für die 6 Hauptprodukte der Studie – nicht für Cross-Sell-Zubehör.
+  // also für die Hauptprodukte der Studie – nicht für Cross-Sell-Zubehör.
   if (productId && typeof trackStudyEvent === 'function') {
-    trackStudyEvent('add_to_cart', productId, { price: price });
+    trackStudyEvent('add_to_cart', productId, { price: price, color: color || null });
   }
   flashCartIcon();
 }
@@ -61,10 +61,11 @@ function updateNavCart() {
     } else {
       dropItems.innerHTML = cart.map(item => {
         total += item.price;
+        const colorLabel = (item.color && typeof colorById === 'function') ? ` <small style="color:var(--text-muted)">(${colorById(item.color).name})</small>` : '';
         return `
         <div class="cart-item">
           <span class="item-emoji">${item.emoji || '📦'}</span>
-          <span style="flex:1">${item.name}</span>
+          <span style="flex:1">${item.name}${colorLabel}</span>
           <span>${item.price.toFixed(2).replace('.', ',')} €</span>
         </div>`;
       }).join('');
@@ -266,6 +267,30 @@ const CROSS_SELL_DATA = {
   rueckwand: [
     { name: 'Regenschutzhülle', price: 9.99, oldPrice: '15,99 €', emoji: '☔' },
     { name: 'Packwürfel-Set', price: 13.99, oldPrice: '21,99 €', emoji: '🧳' }
+  ],
+  tastatur: [
+    { name: 'Mauspad XXL', price: 8.99, oldPrice: '14,99 €', emoji: '🖥️' },
+    { name: 'USB-Hub 4-Port', price: 9.99, oldPrice: '16,99 €', emoji: '🔌' }
+  ],
+  sonnenbrille: [
+    { name: 'Brillenetui Hardcase', price: 7.99, oldPrice: '12,99 €', emoji: '👓' },
+    { name: 'Putztuch-Set', price: 3.99, oldPrice: '6,99 €', emoji: '🧻' }
+  ],
+  shirt: [
+    { name: 'Campus Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' },
+    { name: 'Campus Trinkflasche', price: 12.99, oldPrice: '19,99 €', emoji: '🍶' }
+  ],
+  hoodie: [
+    { name: 'Campus T-Shirt', price: 19.99, oldPrice: '34,99 €', emoji: '👕' },
+    { name: 'Campus Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' }
+  ],
+  cap: [
+    { name: 'Campus T-Shirt', price: 19.99, oldPrice: '34,99 €', emoji: '👕' },
+    { name: 'Campus Trinkflasche', price: 12.99, oldPrice: '19,99 €', emoji: '🍶' }
+  ],
+  flasche: [
+    { name: 'Campus Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' },
+    { name: 'Campus Hoodie', price: 34.99, oldPrice: '59,99 €', emoji: '🧥' }
   ]
 };
 
@@ -292,7 +317,7 @@ function addBundleToCart(productId) {
   const p = window.__shoplyCurrentProduct;
   if (!p) return;
   const pricePer = parseFloat(p.newPrice.replace(' €', '').replace(',', '.'));
-  addToCart(p.name, pricePer, p.image, productId);
+  addToCart(p.name, pricePer, p.image, productId, window.__shoplySelectedColor || null);
   document.querySelectorAll('.cross-sell-card').forEach(card => {
     if (!card.classList.contains('deselected')) {
       addToCart(card.dataset.name, parseFloat(card.dataset.price), card.dataset.emoji);
@@ -337,9 +362,76 @@ function renderRecentlyViewed() {
 }
 
 /* ============================================================
+   PRODUKTÜBERSICHT (index.html) – wird aus products.js gerendert
+   ============================================================ */
+function colorSwatchesHTML(productId, colorIds, selectedId) {
+  return '<div class="color-swatches">' + colorIds.map(function (cid) {
+    const c = colorById(cid);
+    const active = cid === selectedId ? ' active' : '';
+    return '<button type="button" class="color-swatch' + active + '" style="background:' + c.hex +
+      '" data-color="' + cid + '" title="' + c.name + '" ' +
+      'onclick="selectProductColor(this, \'' + productId + '\')"></button>';
+  }).join('') + '</div>';
+}
+
+function renderProductCard(p) {
+  const defaultColor = p.colors[0];
+  const badgeHtml = p.badge
+    ? '<div class="product-badge' + (p.badgeClass ? ' ' + p.badgeClass : '') + '">' + p.badge + '</div>'
+    : '';
+  return `
+    <div class="product-card" data-product="${p.id}" data-selected-color="${defaultColor}">
+      ${badgeHtml}
+      <div class="product-stock-low">⚠️ Nur noch ${p.stockLeft} auf Lager!</div>
+      <div class="product-image" style="background:${colorTint(defaultColor)}">${p.emoji}</div>
+      <h3>${p.name}</h3>
+      <div class="product-rating">${p.ratingStars} <span>(${p.ratingText})</span></div>
+      ${colorSwatchesHTML(p.id, p.colors, defaultColor)}
+      <div class="product-price">
+        <span class="old-price">${euro(p.oldPrice)}</span>
+        <span class="new-price">${euro(p.newPrice)}</span>
+        <span class="discount">${p.discountReal}</span>
+      </div>
+      <p class="product-desc">${p.desc}</p>
+      <div class="product-social">👥 ${p.viewers} Personen schauen sich dieses Produkt an</div>
+      <div class="product-timer">⏱️ Deal endet in <span class="product-countdown">${p.timerStart}</span></div>
+      <a href="product.html?id=${p.id}" class="btn-product">Details ansehen</a>
+      <button class="btn-add-cart" onclick="addToCartFromCard('${p.id}')">In den Warenkorb</button>
+    </div>`;
+}
+
+function renderProductGrid() {
+  const container = document.getElementById('productsGrid');
+  if (!container || typeof PRODUCTS === 'undefined') return;
+  container.innerHTML = PRODUCTS.map(renderProductCard).join('');
+}
+
+/* Klick auf einen Farb-Swatch auf einer Produktkarte */
+function selectProductColor(btn, productId) {
+  const card = btn.closest('.product-card');
+  if (!card) return;
+  const cid = btn.dataset.color;
+  card.dataset.selectedColor = cid;
+  card.querySelectorAll('.color-swatch').forEach(function (s) { s.classList.remove('active'); });
+  btn.classList.add('active');
+  const img = card.querySelector('.product-image');
+  if (img) img.style.background = colorTint(cid);
+}
+
+/* "In den Warenkorb" auf der Produktkarte: berücksichtigt die gewählte Farbe */
+function addToCartFromCard(productId) {
+  const p = PRODUCTS_BY_ID[productId];
+  if (!p) return;
+  const card = document.querySelector('.product-card[data-product="' + productId + '"]');
+  const color = card ? card.dataset.selectedColor : p.colors[0];
+  addToCart(p.name, p.newPrice, p.emoji, productId, color);
+}
+
+/* ============================================================
    INIT – läuft auf jeder Seite
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function () {
+  renderProductGrid(); // muss vor Studien-Skript & Countdown-Init laufen
   updateNavCart();
   initAllCountdowns();
   renderRecentlyViewed();

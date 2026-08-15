@@ -365,6 +365,17 @@ p { margin: 0 0 1em; }
 .discount { background: #FFF1EC; color: var(--accent-dark); font-weight: 800; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 6px; }
 
 .product-desc { font-size: 0.85rem; color: var(--text-muted); flex: 1; }
+
+.color-swatches { display: flex; gap: 0.4rem; margin: 0.2rem 0 0.7rem; flex-wrap: wrap; }
+.color-swatch {
+  width: 22px; height: 22px; border-radius: 999px;
+  border: 2px solid var(--border);
+  padding: 0; cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s;
+}
+.color-swatch:hover { transform: scale(1.12); }
+.color-swatch.active { border-color: var(--dark); box-shadow: 0 0 0 2px var(--surface), 0 0 0 3px var(--dark); }
+
 .product-social { font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.3rem; }
 .product-timer { font-size: 0.8rem; color: var(--accent-dark); font-weight: 600; margin-bottom: 0.9rem; }
 
@@ -489,8 +500,12 @@ p { margin: 0 0 1em; }
   margin: 0.8rem 0;
 }
 
-.qty-selector { display: flex; align-items: center; gap: 0.8rem; margin: 1.2rem 0; }
-.qty-selector label { font-size: 0.88rem; font-weight: 600; }
+.color-selector { margin: 1rem 0; }
+.color-selector label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.5rem; }
+.color-selector .color-swatches { margin: 0; }
+.color-selector .color-swatch { width: 30px; height: 30px; }
+
+.qty-selector { display: flex; align-items: center; gap: 0.8rem; margin: 1.2rem 0; }.qty-selector label { font-size: 0.88rem; font-weight: 600; }
 .qty-controls { display: flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
 .qty-controls button { background: var(--bg); width: 34px; height: 34px; font-size: 1.1rem; }
 .qty-controls button:hover { background: var(--border); }
