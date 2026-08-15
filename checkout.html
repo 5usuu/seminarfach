@@ -237,7 +237,6 @@
 <script src="study.js"></script>
 <script>
 // Warenkorb wird bereits von script.js geladen (globale Variable "cart")
-let hiddenFeesAdded = false;
 
 function renderCart() {
   const container = document.getElementById('cartItems');
@@ -264,34 +263,41 @@ function renderCart() {
   container.innerHTML = cartHTML;
   summary.innerHTML = summaryHTML;
   document.getElementById('subtotal').textContent = total.toFixed(2).replace('.', ',') + ' €';
-  updateTotal(total);
+  updateTotal();
+  startHiddenFeeTimers();
 }
 
-function updateTotal(subtotal) {
-  subtotal = subtotal || cart.reduce((s, i) => s + i.price, 0);
-  let total = subtotal;
+// Welche der zeitverzögerten "versteckten Gebühren" wurden schon enthüllt?
+const revealedFees = { fee1: false, fee2: false, fee3: false };
+let feeTimersStarted = false;
 
-  // Add hidden fees progressively
-  if (!hiddenFeesAdded) {
-    hiddenFeesAdded = true;
-    setTimeout(() => {
-      document.getElementById('fee1').style.display = 'flex';
-      total += 2.99;
-      document.getElementById('totalPrice').textContent = total.toFixed(2).replace('.', ',') + ' €';
-    }, 3000);
-    setTimeout(() => {
-      document.getElementById('fee2').style.display = 'flex';
-      total += 1.99;
-      document.getElementById('totalPrice').textContent = total.toFixed(2).replace('.', ',') + ' €';
-    }, 6000);
-    setTimeout(() => {
-      document.getElementById('fee3').style.display = 'flex';
-      total += 0.99;
-      document.getElementById('totalPrice').textContent = total.toFixed(2).replace('.', ',') + ' €';
-    }, 9000);
-  }
+function currentSubtotal() {
+  return cart.reduce((s, i) => s + i.price, 0);
+}
+
+// Berechnet die Gesamtsumme IMMER frisch aus: Zwischensumme + bereits enthüllte
+// Zeit-Gebühren + angehakte Zusatz-Optionen. So bleibt der angezeigte Betrag
+// bei jeder Änderung (Checkbox, Timer, Artikel entfernen) konsistent.
+function updateTotal() {
+  let total = currentSubtotal();
+  if (revealedFees.fee1) total += 2.99;
+  if (revealedFees.fee2) total += 1.99;
+  if (revealedFees.fee3) total += 0.99;
+
+  const premShip = document.getElementById('premShip');
+  const giftWrap = document.getElementById('giftWrap');
+  if (premShip && premShip.checked) total += 4.99;
+  if (giftWrap && giftWrap.checked) total += 3.99;
 
   document.getElementById('totalPrice').textContent = total.toFixed(2).replace('.', ',') + ' €';
+}
+
+function startHiddenFeeTimers() {
+  if (feeTimersStarted) return;
+  feeTimersStarted = true;
+  setTimeout(() => { revealedFees.fee1 = true; document.getElementById('fee1').style.display = 'flex'; updateTotal(); }, 3000);
+  setTimeout(() => { revealedFees.fee2 = true; document.getElementById('fee2').style.display = 'flex'; updateTotal(); }, 6000);
+  setTimeout(() => { revealedFees.fee3 = true; document.getElementById('fee3').style.display = 'flex'; updateTotal(); }, 9000);
 }
 
 function removeItem(index) {
@@ -324,6 +330,12 @@ function closeSubModal(reconsider) {
 }
 
 function finalizeOrder() {
+  if (cart.length === 0) {
+    // Nichts zu bestellen (z.B. Seite direkt ohne Warenkorb-Inhalt aufgerufen)
+    window.location.href = 'index.html';
+    return;
+  }
+
   trackInteraction('order_finalize', { items: cart.map(i => i.name), total: document.getElementById('totalPrice').textContent });
 
   // STUDIE: für jedes der 6 Hauptprodukte im Warenkorb ein "purchase"-Event senden

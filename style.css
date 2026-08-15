@@ -502,6 +502,7 @@ p { margin: 0 0 1em; }
 .product-detail-info h1 { font-size: 1.8rem; }
 
 .price-inflated { display: flex; align-items: baseline; gap: 0.6rem; font-size: 0.85rem; color: var(--text-muted); margin: -0.4rem 0 0.6rem; }
+.inflated-label { font-weight: 600; }
 .inflated-price { text-decoration: line-through; }
 .inflated-you-save { color: var(--success); font-weight: 700; }
 
@@ -516,6 +517,8 @@ p { margin: 0 0 1em; }
   padding: 0.55rem 0.9rem; border-radius: var(--radius-sm);
   margin: 0.8rem 0;
 }
+.fire-icon { font-size: 1.1rem; }
+.counter-num { font-weight: 800; color: #B45309; }
 
 .color-selector { margin: 1rem 0; }
 .color-selector label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.5rem; }
@@ -642,6 +645,7 @@ p { margin: 0 0 1em; }
 .checkout-page { max-width: 1150px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
 .checkout-page h1 { font-size: 1.7rem; }
 .checkout-container { display: grid; grid-template-columns: 1fr 340px; gap: 2.5rem; align-items: start; margin-top: 1.5rem; }
+.checkout-main { min-width: 0; }
 
 .checkout-progress { display: flex; gap: 0.5rem; margin-bottom: 1.6rem; flex-wrap: wrap; }
 .progress-step {

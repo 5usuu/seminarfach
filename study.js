@@ -156,6 +156,7 @@ function hashString(str) {
 // true = für diese Person wird das Produkt MIT Dark Patterns gezeigt (Standard im HTML)
 // false = für diese Person wird das Produkt in der ehrlichen "Normal"-Variante gezeigt
 function isManipulated(productId) {
+  if (STUDY_KEY === '0' || STUDY_KEY === 'control') return false; // Kontrollgruppe: immer sauber
   return hashString(STUDY_KEY + ':' + productId) % 2 === 0;
 }
 

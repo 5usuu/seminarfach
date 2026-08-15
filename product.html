@@ -250,7 +250,13 @@ window.__shoplyCurrentProduct = p;
 
 document.getElementById('pdImage').textContent = p.image;
 document.getElementById('pdName').textContent = p.name;
-document.getElementById('pdBadge').textContent = p.badge;
+const pdBadgeEl = document.getElementById('pdBadge');
+if (p.badge) {
+  pdBadgeEl.textContent = p.badge;
+  pdBadgeEl.style.display = '';
+} else {
+  pdBadgeEl.style.display = 'none';
+}
 document.getElementById('pdRating').innerHTML = p.rating;
 
 // FAKE PRICE INFLATION (#5): show inflated UVP

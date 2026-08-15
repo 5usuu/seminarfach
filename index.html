@@ -237,11 +237,11 @@
     <div>
       <h4>Newsletter</h4>
       <p>Erhalte die besten Deals direkt per E-Mail!</p>
-      <form action="https://formspree.io/f/xpwdqjkl" method="POST" class="newsletter-form">
+      <form id="newsletterForm" class="newsletter-form">
         <input type="email" name="email" placeholder="Deine E-Mail" required>
-        <input type="hidden" name="_subject" value="Neue Newsletter-Anmeldung SHOPLY">
         <button type="submit">Abonnieren</button>
       </form>
+      <p id="newsletterConfirm" style="display:none;font-size:0.78rem;color:#8CE0A8;margin-top:0.5rem">✓ Danke! (Demo – es wurde keine echte E-Mail verschickt)</p>
     </div>
   </div>
   <div class="footer-bottom">
@@ -252,5 +252,13 @@
 <script src="products.js"></script>
 <script src="script.js"></script>
 <script src="study.js"></script>
+<script>
+document.getElementById('newsletterForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  trackInteraction('newsletter_signup', {});
+  this.style.display = 'none';
+  document.getElementById('newsletterConfirm').style.display = 'block';
+});
+</script>
 </body>
 </html>
