@@ -4,24 +4,35 @@
 
    WIE ES FUNKTIONIERT
    --------------------
-   1. Jede/r Mitschüler/in bekommt einen eigenen Link mit einer
-      Kennung, z.B.:
-         index.html?s=schueler1
-         index.html?s=schueler2
-      Die Kennung wird beim ersten Aufruf im Browser gespeichert
-      (localStorage), man muss sie also nicht auf jeder Unterseite
-      erneut anhängen.
+   1. Alle Mitschüler/innen bekommen DENSELBEN Link (z.B. die
+      normale GitHub-Pages-URL, ganz ohne Zusatz). Beim allerersten
+      Besuch erscheint ein Overlay: "Wähle deinen Geburtsmonat".
+      Diese Wahl wird im Browser gespeichert (localStorage) und ist
+      danach die "Kennung" dieser Person – man sieht das Overlay nur
+      einmal, auf allen drei Seiten.
 
-   2. Für JEDES Hauptprodukt (siehe products.js) wird aus der Schüler-Kennung
+      Hinweis: Da es nur 12 Monate gibt, teilen sich mehrere
+      Mitschüler/innen dieselbe Kennung (= dieselbe Zuordnung
+      manipuliert/normal je Produkt). Ihr bekommt also 12 Gruppen
+      statt einzelner Personen – das reicht für "manipuliert vs.
+      normal" völlig aus und ist nebenbei anonymer.
+
+      Für eigene Tests könnt ihr weiterhin manuell eine eigene
+      Kennung über den Link erzwingen, z.B. index.html?s=test –
+      dann wird KEIN Geburtsmonat-Overlay angezeigt.
+      Sonderfall index.html?s=0 (oder ?s=control): zeigt ALLES in
+      der sauberen Variante – praktisch als Kontrolltest.
+
+   2. Für JEDES Hauptprodukt (siehe products.js) wird aus der Kennung
       deterministisch (aber für Außenstehende nicht vorhersagbar)
       berechnet, ob es bei dieser Person "manipuliert" (mit Dark
       Patterns) oder "normal" (ehrliche Darstellung) angezeigt
-      wird. Gleiche Person + gleiches Produkt = immer dasselbe
-      Ergebnis. Andere Person = andere Verteilung.
+      wird. Gleiche Kennung + gleiches Produkt = immer dasselbe
+      Ergebnis. Andere Kennung = andere Verteilung.
 
    3. Klicks auf "Details ansehen", Warenkorb-Zugänge und Käufe
-      werden zusammen mit Schüler-Kennung, Produkt und Variante
-      an ein Google Sheet gesendet (siehe SETUP-ANLEITUNG unten).
+      werden zusammen mit Kennung, Produkt und Variante an ein
+      Google Sheet gesendet (siehe SETUP-ANLEITUNG unten).
 
 
    SETUP-ANLEITUNG (einmalig, ca. 5 Minuten)
@@ -55,7 +66,56 @@ const STUDY_PRODUCTS = (typeof PRODUCTS !== 'undefined')
   ? PRODUCTS.map(p => p.id)
   : ['kopfhoerer', 'smartwatch', 'tasche', 'maus', 'sneaker', 'rueckwand'];
 
-/* ---------- Schüler-Kennung ermitteln & merken ---------- */
+/* ============================================================
+   GEBURTSMONAT-OVERLAY
+   ============================================================
+   Läuft synchron, BEVOR der Rest der Seite sichtbar wird (da
+   study.js ganz am Ende von <body> eingebunden ist, existiert das
+   <body>-Element schon, aber noch nichts wurde vom Nutzer gesehen).
+   Erscheint nur, wenn weder ein ?s=... in der URL steht noch schon
+   eine Kennung gespeichert ist. */
+const STUDY_MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+  'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+function needsMonthPicker() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('s')) return false; // manueller Override (Lehrer/Testing)
+  return !localStorage.getItem('shoply_study_id');
+}
+
+function showMonthPicker() {
+  const overlay = document.createElement('div');
+  overlay.id = 'monthPickerOverlay';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal month-picker-modal">
+      <h2>🎁 Für dein persönliches Angebot</h2>
+      <p class="modal-subtitle">Wähle kurz deinen Geburtsmonat, damit wir dir passende Deals zeigen können.</p>
+      <div class="month-picker-grid">
+        ${STUDY_MONTHS.map((m, i) => `<button type="button" class="month-btn" data-month="${i + 1}">${m}</button>`).join('')}
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelectorAll('.month-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      localStorage.setItem('shoply_study_id', 'monat-' + this.dataset.month);
+      window.location.reload();
+    });
+  });
+}
+
+if (needsMonthPicker()) {
+  // document.body existiert bereits (study.js steht am Ende von <body>),
+  // aber DOMContentLoaded ist noch nicht gefeuert – die Seite dahinter
+  // ist also noch nirgends interaktiv, wenn das Overlay erscheint.
+  if (document.body) {
+    showMonthPicker();
+  } else {
+    document.addEventListener('DOMContentLoaded', showMonthPicker);
+  }
+}
+
+/* ---------- Kennung ermitteln (Geburtsmonat-Overlay ODER manueller ?s=...-Override) ---------- */
 function getStudentId() {
   const params = new URLSearchParams(window.location.search);
   const fromUrl = params.get('s');
@@ -86,6 +146,10 @@ function isManipulated(productId) {
 
 /* ---------- Events an das Google Sheet senden ---------- */
 function trackStudyEvent(eventType, productId, extra) {
+  // Solange das Geburtsmonat-Overlay noch offen ist (Kennung unbekannt),
+  // wird nichts gesendet – sonst gäbe es "unbekannt"-Datenmüll im Sheet.
+  if (STUDY_ID === 'unbekannt') return;
+
   const payload = {
     studentId: STUDY_ID,
     eventType: eventType,

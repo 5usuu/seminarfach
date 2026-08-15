@@ -221,6 +221,23 @@ p { margin: 0 0 1em; }
 .cookie-hinweis { font-size: 0.76rem; color: var(--text-muted); margin: 0.9rem 0 0; }
 
 /* ============================================================
+   GEBURTSMONAT-OVERLAY (Studien-Kennung, siehe study.js)
+   ============================================================ */
+.month-picker-modal { max-width: 460px; text-align: center; }
+.month-picker-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem;
+  margin-top: 1.3rem;
+}
+.month-btn {
+  padding: 0.75rem 0.4rem;
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--text);
+  font-weight: 600; font-size: 0.85rem;
+  transition: border-color 0.15s, transform 0.15s, background 0.15s;
+}
+.month-btn:hover { border-color: var(--dark); background: var(--bg); transform: translateY(-2px); }
+
+/* ============================================================
    HERO   (AIDA: Attention)
    ============================================================ */
 .hero {
