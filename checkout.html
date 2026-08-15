@@ -45,7 +45,19 @@
 </nav>
 
 <div class="checkout-page">
-  <div class="checkout-container">
+
+  <!-- Order confirmation (Demo – ersetzt den echten Formspree-Versand) -->
+  <div id="orderConfirmation" class="order-confirmation" style="display:none">
+    <div class="confirmation-box">
+      <div class="confirmation-icon">✅</div>
+      <h2>Bestellung abgeschlossen</h2>
+      <p>Das ist eine <strong>Demo-Bestellung</strong> für die Seminarfacharbeit – es wurde keine echte Zahlung verarbeitet und deine Adressdaten wurden an niemanden verschickt.</p>
+      <p class="confirmation-hint">Für die Studie wurde nur festgehalten, <em>welche Produkte</em> in welcher Variante gekauft wurden – ganz ohne deinen Namen oder deine Adresse.</p>
+      <a href="index.html" class="btn-go-cart" style="display:inline-block;margin-top:1rem">Zurück zum Shop</a>
+    </div>
+  </div>
+
+  <div class="checkout-container" id="checkoutContainer">
     <div class="checkout-main">
       <h1>Bestellabschluss</h1>
 
@@ -66,7 +78,7 @@
       <!-- Shipping form -->
       <div class="checkout-section">
         <h2>Versandadresse</h2>
-        <form id="checkoutForm" action="https://formspree.io/f/xpwdqjkl" method="POST">
+        <form id="checkoutForm" method="POST">
           <div class="form-row">
             <div class="form-group">
               <label>Vorname *</label>
@@ -148,7 +160,7 @@
 
           <!-- MISDIRECTION: Big green buy button, tiny back button -->
           <div class="final-actions">
-            <button type="submit" class="btn-final-buy" onclick="return finalizeOrder()">
+            <button type="submit" class="btn-final-buy">
               🔒 Jetzt kostenpflichtig bestellen
             </button>
             <a href="index.html" class="back-to-shop">← Zurück zum Shop</a>
@@ -321,9 +333,23 @@ function finalizeOrder() {
     });
   }
 
-  // Form submits to Formspree
-  return true;
+  // Warenkorb leeren und Bestätigung statt echtem Versand anzeigen (Demo)
+  cart = [];
+  saveCart();
+  updateNavCart();
+  document.getElementById('checkoutContainer').style.display = 'none';
+  document.getElementById('orderConfirmation').style.display = 'flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// Die native Pflichtfeld-Validierung (required-Attribute) läuft weiterhin ganz
+// normal beim Klick auf "Jetzt kostenpflichtig bestellen". Erst wenn alle
+// Felder gültig sind, feuert der "submit"-Event – hier wird dann die echte
+// Netzwerk-Übertragung verhindert und stattdessen finalizeOrder() ausgeführt.
+document.getElementById('checkoutForm').addEventListener('submit', function (e) {
+  e.preventDefault();
+  finalizeOrder();
+});
 
 // Cart timer
 let cartTime = 14 * 60 + 32;

@@ -693,6 +693,21 @@ p { margin: 0 0 1em; }
 .empty-cart { text-align: center; padding: 2rem 0; color: var(--text-muted); }
 .empty-cart a { color: var(--accent-dark); font-weight: 600; }
 
+.order-confirmation {
+  align-items: center; justify-content: center;
+  padding: 3rem 1rem;
+}
+.confirmation-box {
+  max-width: 480px; margin: 0 auto; text-align: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-md);
+}
+.confirmation-icon { font-size: 3rem; margin-bottom: 0.5rem; }
+.confirmation-box h2 { font-size: 1.4rem; }
+.confirmation-box p { font-size: 0.9rem; color: var(--text-muted); }
+.confirmation-hint { font-size: 0.82rem; background: #EAF7EF; color: #14532D; border-radius: var(--radius-sm); padding: 0.8rem 1rem; }
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */
