@@ -46,7 +46,7 @@
    ============================================================ */
 
 // TODO: Nach dem Setup (siehe oben) hier die eigene Apps-Script-Web-App-URL eintragen
-const STUDY_ENDPOINT = 'HIER_DEINE_APPS_SCRIPT_WEB_APP_URL_EINFUEGEN';
+const STUDY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxdzhbbq-xcbSA5AwcmCwE2u66EzABJyRPYSCz3uIAjckohn1LpnaqsBMBjKc6W7AFi/exec';
 
 // Die Hauptprodukte, die Teil der Studie sind – wird automatisch aus
 // products.js übernommen (dort einfach neue Produkte ergänzen, sie werden
