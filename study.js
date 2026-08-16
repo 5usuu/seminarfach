@@ -212,7 +212,7 @@ function applyVariantToCard(card) {
   if (social) social.remove();
   if (oldPrice) oldPrice.remove();
   if (discount) discount.remove();
-  if (badge && /🔥/.test(badge.textContent)) badge.remove();
+  if (badge) badge.remove();
 }
 
 function applyVariantToProductGrid() {
@@ -232,7 +232,7 @@ function applyVariantToProductDetail(productId) {
   if (bait) bait.remove();
 
   const badge = document.getElementById('pdBadge');
-  if (badge && /🔥/.test(badge.textContent)) badge.remove();
+  if (badge) badge.remove();
 
   // Preis ehrlich anzeigen: nur der tatsächliche Preis, ohne
   // durchgestrichenen "UVP" und ohne Rabatt-Sticker
