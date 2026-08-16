@@ -112,11 +112,22 @@ function acceptCookies() {
   trackInteraction('cookies_accept_all', {});
   localStorage.setItem('shoply_cookie_consent', 'all');
   hideCookieBanner();
+  // Studie: schneller Weg gewählt – alle Kategorien gelten als akzeptiert
+  if (typeof trackStudyEvent === 'function') {
+    trackStudyEvent('cookie_accept_all', null, {
+      acceptedCount: COOKIE_TOGGLES.length,
+      accepted: COOKIE_TOGGLES.slice()
+    });
+  }
 }
 
 function showCookieSettings() {
   trackInteraction('cookie_settings_opened', {});
   document.getElementById('cookieModal').style.display = 'flex';
+  // Studie: mühsamerer Weg gewählt (Einstellungen statt direkt "Alle akzeptieren")
+  if (typeof trackStudyEvent === 'function') {
+    trackStudyEvent('cookie_open_settings', null, {});
+  }
 }
 
 function toggleCookie(name) {
@@ -132,14 +143,27 @@ function toggleCookie(name) {
 
 function saveCookieSettings() {
   const consent = {};
+  const accepted = [];
   COOKIE_TOGGLES.forEach(name => {
     const el = document.getElementById(name);
-    if (el) consent[name] = el.checked;
+    if (el) {
+      consent[name] = el.checked;
+      if (el.checked) accepted.push(name);
+    }
   });
   localStorage.setItem('shoply_cookie_consent', JSON.stringify(consent));
   trackInteraction('cookie_settings_saved', consent);
   document.getElementById('cookieModal').style.display = 'none';
   hideCookieBanner();
+  // Studie: Endergebnis nach manueller Auswahl – wie viele/welche Kategorien blieben an?
+  if (typeof trackStudyEvent === 'function') {
+    trackStudyEvent('cookie_save_settings', null, {
+      acceptedCount: accepted.length,
+      accepted: accepted,
+      allAccepted: accepted.length === COOKIE_TOGGLES.length,
+      allRejected: accepted.length === 0
+    });
+  }
 }
 
 function hideCookieBanner() {

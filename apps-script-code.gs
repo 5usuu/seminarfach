@@ -21,13 +21,12 @@
    -> "Neue Version" erneut bereitstellen, sonst läuft weiter die
    alte Version!
 
-   ⚠️ WICHTIG BEI DIESEM UPDATE: Die Spalten-Reihenfolge hat sich
-   geändert (neue Spalte "Monatsgruppe" dazugekommen). Bitte VOR dem
-   ersten Test die Tabellenblätter "Events" und "Auswertung" in
-   deinem Sheet komplett löschen (Rechtsklick auf den Reiter unten
-   -> Löschen) – sie werden beim nächsten Event automatisch neu und
-   mit den richtigen Spalten angelegt. Alte Testdaten sonst vorher
-   sichern, falls sie noch gebraucht werden.
+   ⚠️ WICHTIG BEI DIESEM UPDATE: Zwei neue Spalten sind dazugekommen
+   (Cookie-Anzahl, Cookie-Kategorien). Bitte VOR dem nächsten Test die
+   Tabellenblätter "Events" und "Auswertung" in deinem Sheet komplett
+   löschen (Rechtsklick auf den Reiter unten -> Löschen) – sie werden
+   beim nächsten Event automatisch neu und mit den richtigen Spalten
+   angelegt. Alte Testdaten sonst vorher sichern, falls noch gebraucht.
 
    ERGEBNIS: Es entstehen automatisch ZWEI Tabellenblätter:
    - "Events"      -> jede einzelne Aktion als eigene Zeile
@@ -36,10 +35,15 @@
                       (z.B. "monat-5-K7F2"), damit sich einzelne
                       Käufe/Besuche auch bei vielen Personen aus
                       derselben Monatsgruppe unterscheiden lassen.
+                      Enthält auch die Cookie-Banner-Entscheidungen
+                      (cookie_accept_all / cookie_open_settings /
+                      cookie_save_settings), inkl. wie viele der 5
+                      optionalen Kategorien am Ende akzeptiert wurden.
    - "Auswertung"  -> fertige Zusammenfassungen (Aufrufe, Warenkorb,
-                      Käufe je Produkt + Variante, sowie Aktivität
-                      je Monatsgruppe), aktualisiert sich automatisch
-                      mit den Events – nichts manuell nötig.
+                      Käufe je Produkt + Variante, Aktivität je
+                      Monatsgruppe, sowie Cookie-Entscheidungen),
+                      aktualisiert sich automatisch mit den Events –
+                      nichts manuell nötig.
    ============================================================ */
 
 const EVENTS_SHEET_NAME = 'Events';
@@ -74,6 +78,8 @@ function doPost(e) {
     data.variant || '',
     extra.price != null ? extra.price : '',
     extra.color || '',
+    extra.acceptedCount != null ? extra.acceptedCount : '',
+    (extra.accepted && extra.accepted.length) ? extra.accepted.join(', ') : '',
     data.page || '',
     JSON.stringify(extra)   // Rohdaten bleiben zusätzlich als Sicherheit erhalten
   ]);
@@ -98,10 +104,10 @@ function getOrCreateEventsSheet(ss) {
   var sheet = ss.getSheetByName(EVENTS_SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(EVENTS_SHEET_NAME);
-    sheet.appendRow(['Zeitstempel', 'Kennung', 'Monatsgruppe', 'Event', 'Produkt', 'Variante', 'Preis', 'Farbe', 'Seite', 'Zusatzinfo (roh)']);
+    sheet.appendRow(['Zeitstempel', 'Kennung', 'Monatsgruppe', 'Event', 'Produkt', 'Variante', 'Preis', 'Farbe', 'Cookie-Anzahl', 'Cookie-Kategorien', 'Seite', 'Zusatzinfo (roh)']);
     sheet.setFrozenRows(1);
-    sheet.getRange('A1:J1').setFontWeight('bold');
-    sheet.setColumnWidths(1, 10, 130);
+    sheet.getRange('A1:L1').setFontWeight('bold');
+    sheet.setColumnWidths(1, 12, 130);
   }
   return sheet;
 }
@@ -117,38 +123,52 @@ function getOrCreateSummarySheet(ss) {
 
   sheet.getRange('A1').setValue('👁️ Seitenaufrufe je Produkt & Variante').setFontWeight('bold');
   sheet.getRange('A2').setFormula(
-    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:J, ' +
+    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:L, ' +
     '"select E, F, count(A) where D = \'view_product\' and E <> \'\' group by E, F ' +
     'label E \'Produkt\', F \'Variante\', count(A) \'Aufrufe\'", 0), "Noch keine Daten")'
   );
 
   sheet.getRange('E1').setValue('🛒 In den Warenkorb je Produkt & Variante').setFontWeight('bold');
   sheet.getRange('E2').setFormula(
-    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:J, ' +
+    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:L, ' +
     '"select E, F, count(A) where D = \'add_to_cart\' and E <> \'\' group by E, F ' +
     'label E \'Produkt\', F \'Variante\', count(A) \'Warenkorb\'", 0), "Noch keine Daten")'
   );
 
   sheet.getRange('I1').setValue('✅ Käufe je Produkt & Variante').setFontWeight('bold');
   sheet.getRange('I2').setFormula(
-    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:J, ' +
+    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:L, ' +
     '"select E, F, count(A) where D = \'purchase\' and E <> \'\' group by E, F ' +
     'label E \'Produkt\', F \'Variante\', count(A) \'Käufe\'", 0), "Noch keine Daten")'
   );
 
   sheet.getRange('A4').setValue('📊 Aktivität je Monatsgruppe (unabhängig vom Produkt)').setFontWeight('bold');
   sheet.getRange('A5').setFormula(
-    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:J, ' +
+    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:L, ' +
     '"select C, count(A) where C <> \'\' group by C order by C ' +
     'label C \'Monatsgruppe\', count(A) \'Anzahl Events\'", 0), "Noch keine Daten")'
   );
 
   sheet.getRange('E4').setValue('👤 Aktivität je einzelner Kennung (wer war wie oft aktiv)').setFontWeight('bold');
   sheet.getRange('E5').setFormula(
-    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:J, ' +
+    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:L, ' +
     '"select B, count(A) where B <> \'\' group by B order by B ' +
     'label B \'Kennung\', count(A) \'Anzahl Events\'", 0), "Noch keine Daten")'
   );
+
+  sheet.getRange('A7').setValue('🍪 Cookie-Banner: gewählter Weg (schnell vs. mühsam)').setFontWeight('bold');
+  sheet.getRange('A8').setFormula(
+    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:L, ' +
+    '"select D, count(A) where D matches \'cookie_.*\' group by D order by D ' +
+    'label D \'Event\', count(A) \'Anzahl\'", 0), "Noch keine Daten")'
+  );
+
+  sheet.getRange('E7').setValue('🍪 Ø akzeptierte Cookie-Kategorien (von 5) bei Endentscheidung').setFontWeight('bold');
+  sheet.getRange('E8').setFormula(
+    '=IFERROR(ROUND(AVERAGE(QUERY(' + EVENTS_SHEET_NAME + '!A2:L, ' +
+    '"select I where D = \'cookie_accept_all\' or D = \'cookie_save_settings\'", 0)), 2), "Noch keine Daten")'
+  );
+  sheet.getRange('E9').setValue('(5 = alle akzeptiert, 0 = alle abgelehnt)').setFontStyle('italic').setFontColor('#6B7080');
 
   sheet.setColumnWidths(1, 14, 130);
   return sheet;
