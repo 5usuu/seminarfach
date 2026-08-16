@@ -23,12 +23,16 @@
       Sonderfall index.html?s=0 (oder ?s=control): zeigt ALLES in
       der sauberen Variante – praktisch als Kontrolltest.
 
-   2. Für JEDES Hauptprodukt (siehe products.js) wird aus der Kennung
-      deterministisch (aber für Außenstehende nicht vorhersagbar)
-      berechnet, ob es bei dieser Person "manipuliert" (mit Dark
-      Patterns) oder "normal" (ehrliche Darstellung) angezeigt
-      wird. Gleiche Kennung + gleiches Produkt = immer dasselbe
-      Ergebnis. Andere Kennung = andere Verteilung.
+   2. Für JEDE Monatsgruppe wird aus der Kennung deterministisch (aber für
+      Außenstehende nicht vorhersagbar) berechnet, welche HÄLFTE der
+      Hauptprodukte (siehe products.js) "manipuliert" (mit Dark Patterns)
+      und welche "normal" (ehrliche Darstellung) angezeigt wird. Jede
+      Gruppe bekommt dabei exakt dieselbe ANZAHL manipulierter Produkte
+      (z.B. 6 von 12) – nur WELCHE Produkte das sind, unterscheidet sich
+      von Monat zu Monat. Das macht den Vergleich zwischen den Gruppen
+      fair, weil niemand insgesamt mehr oder weniger Dark Patterns zu
+      sehen bekommt als eine andere Gruppe. Gleiche Kennung = immer
+      dieselbe Zuordnung, andere Kennung = andere Verteilung.
 
    3. Klicks auf "Details ansehen", Warenkorb-Zugänge und Käufe
       werden zusammen mit Kennung, Produkt und Variante an ein
@@ -143,7 +147,18 @@ function getStudentKey() {
 const STUDY_ID = getStudentId();
 const STUDY_KEY = getStudentKey();
 
-/* ---------- Deterministische Varianten-Zuordnung ---------- */
+/* ---------- Deterministische, FAIR BALANCIERTE Varianten-Zuordnung ----------
+   Wichtig fürs Studiendesign, gleich in zweifacher Hinsicht:
+   1. Jede Monatsgruppe bekommt exakt dieselbe ANZAHL manipulierter Produkte
+      (z.B. bei 12 Produkten immer genau 6).
+   2. Jedes einzelne Produkt wird über alle 12 Monate hinweg auch exakt
+      gleich oft manipuliert (bei 12 Monaten und 12 Produkten: jedes
+      Produkt in genau 6 von 12 Monaten).
+   Dafür wird KEIN Zufallsgenerator verwendet (die hätten, wie sich in Tests
+   zeigte, leicht ungleiche Verteilungen erzeugen können), sondern ein festes
+   Rotationsprinzip: Für Monat X ist ein "Fenster" von der halben Produktanzahl
+   an Produkten manipuliert, das mit dem Monat weiterwandert (zyklisch). Das
+   ist mathematisch garantiert balanciert, nicht nur "meistens ausgeglichen". */
 function hashString(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -153,11 +168,45 @@ function hashString(str) {
   return Math.abs(hash);
 }
 
+let _manipulatedSetCache = null;
+
+// Berechnet EINMAL pro Seitenaufruf, welche Produkte für diese Kennung
+// manipuliert sind – als Set, damit isManipulated() schnell nachschlagen kann.
+function getManipulatedSet() {
+  if (_manipulatedSetCache) return _manipulatedSetCache;
+
+  if (STUDY_KEY === '0' || STUDY_KEY === 'control') {
+    _manipulatedSetCache = new Set(); // Kontrollgruppe: nichts manipuliert
+    return _manipulatedSetCache;
+  }
+
+  const n = STUDY_PRODUCTS.length;
+  const half = Math.round(n / 2);
+
+  // Bei echten Geburtsmonaten (Kennung "1".."12") wird der Rotations-Offset
+  // direkt aus der Monatszahl abgeleitet – das garantiert, dass alle 12
+  // möglichen Fenster-Positionen auch wirklich einmal vorkommen (siehe
+  // Kommentar oben). Bei manuellen Test-Kennungen (?s=irgendwas) wird
+  // stattdessen ein Hash als Ersatz-Offset verwendet – dann bleibt zwar die
+  // Anzahl je "Gruppe" balanciert, aber die Rundum-Balance über alle Monate
+  // gilt logischerweise nur für die echten Monatswerte 1-12.
+  const monthNumber = parseInt(STUDY_KEY, 10);
+  const offset = (!isNaN(monthNumber) && String(monthNumber) === STUDY_KEY)
+    ? (monthNumber - 1) % n
+    : hashString(STUDY_KEY) % n;
+
+  const manipulated = new Set();
+  for (let k = 0; k < half; k++) {
+    manipulated.add(STUDY_PRODUCTS[(offset + k) % n]);
+  }
+  _manipulatedSetCache = manipulated;
+  return _manipulatedSetCache;
+}
+
 // true = für diese Person wird das Produkt MIT Dark Patterns gezeigt (Standard im HTML)
 // false = für diese Person wird das Produkt in der ehrlichen "Normal"-Variante gezeigt
 function isManipulated(productId) {
-  if (STUDY_KEY === '0' || STUDY_KEY === 'control') return false; // Kontrollgruppe: immer sauber
-  return hashString(STUDY_KEY + ':' + productId) % 2 === 0;
+  return getManipulatedSet().has(productId);
 }
 
 /* ---------- Events an das Google Sheet senden ---------- */
