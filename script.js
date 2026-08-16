@@ -407,7 +407,7 @@ function renderProductCard(p) {
     <div class="product-card" data-product="${p.id}" data-selected-color="${defaultColor}">
       ${badgeHtml}
       <div class="product-stock-low">⚠️ Nur noch ${p.stockLeft} auf Lager!</div>
-      <div class="product-image" style="background:${colorTint(defaultColor)}">${p.emoji}</div>
+      <div class="product-image" style="background:${colorTint(defaultColor)}">${productImageHTML(p)}</div>
       <h3>${p.name}</h3>
       <div class="product-rating">${p.ratingStars} <span>(${p.ratingText})</span></div>
       ${colorSwatchesHTML(p.id, p.colors, defaultColor)}

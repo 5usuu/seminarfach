@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SHOPLY – Produkt</title>
 <link rel="stylesheet" href="style.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -248,7 +250,7 @@ currentProductId = productId;
 const p = products[productId] || products.kopfhoerer;
 window.__shoplyCurrentProduct = p;
 
-document.getElementById('pdImage').textContent = p.image;
+document.getElementById('pdImage').innerHTML = productImageHTML(p);
 document.getElementById('pdName').textContent = p.name;
 const pdBadgeEl = document.getElementById('pdBadge');
 if (p.badge) {
