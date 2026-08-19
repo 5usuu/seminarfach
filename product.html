@@ -70,13 +70,13 @@
         <span class="inflated-you-save" id="pdYouSave"></span>
       </div>
 
-      <div class="product-stock-low" id="pdStock">⚠️ Nur noch 3 auf Lager!</div>
-      <div class="product-social" id="pdSocial">👥 127 Personen schauen sich dieses Produkt an</div>
-      <div class="product-timer" id="pdTimer">⏱️ Deal endet in <span class="product-countdown">02:14:33</span></div>
+      <div class="product-stock-low" id="pdStock"></div>
+      <div class="product-social" id="pdSocial"></div>
+      <div class="product-timer" id="pdTimer"></div>
 
       <!-- LIVE SALES COUNTER (#6) -->
       <div class="live-sales-counter" id="liveSalesCounter" style="display:none">
-        <span class="fire-icon">🔥</span>
+        <span class="fire-icon" id="fireIconSlot"></span>
         <span><span class="counter-num" id="liveSalesCount">37</span>x in den letzten 24 Stunden verkauft</span>
       </div>
 
@@ -254,7 +254,9 @@ document.getElementById('pdImage').innerHTML = productImageHTML(p);
 document.getElementById('pdName').textContent = p.name;
 const pdBadgeEl = document.getElementById('pdBadge');
 if (p.badge) {
-  pdBadgeEl.textContent = p.badge;
+  pdBadgeEl.className = 'product-badge' + (p.badgeClass ? ' ' + p.badgeClass : '');
+  const badgeIcon = p.badgeClass === 'hot' ? ICONS.flame : '';
+  pdBadgeEl.innerHTML = badgeIcon + '<span>' + p.badge + '</span>';
   pdBadgeEl.style.display = '';
 } else {
   pdBadgeEl.style.display = 'none';
@@ -271,8 +273,9 @@ const saved = (oldNum - newNum).toFixed(2).replace('.',',');
 document.getElementById('pdYouSave').textContent = `Du sparst ${saved} €`;
 
 document.getElementById('pdDesc').textContent = p.desc;
-document.getElementById('pdStock').textContent = p.stock;
-document.getElementById('pdSocial').textContent = p.social;
+document.getElementById('pdStock').innerHTML = ICONS.alertTriangle + '<span>' + p.stock + '</span>';
+document.getElementById('pdSocial').innerHTML = ICONS.eye + '<span>' + p.social + '</span>';
+document.getElementById('pdTimer').innerHTML = ICONS.clock + '<span>Deal endet in <span class="product-countdown">' + (p.timerStart || '02:00:00') + '</span></span>';
 document.title = "SHOPLY – " + p.name;
 
 // FARBAUSWAHL
@@ -307,6 +310,7 @@ document.getElementById('stickyOld').textContent = p.uvp;
 document.getElementById('stickyNew').textContent = p.newPrice;
 
 // LIVE COUNTER init
+document.getElementById('fireIconSlot').innerHTML = ICONS.flame;
 document.getElementById('liveSalesCounter').style.display = 'flex';
 startLiveCounter();
 

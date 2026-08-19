@@ -33,6 +33,24 @@ function colorTint(id) {
   return colorById(id).hex + '26';
 }
 
+/* ============================================================
+   ICON-SET (echte SVG-Icons statt Emoji als funktionale Icons)
+   Schlanke, strichbasierte Icons im Feather-Stil, currentColor
+   ============================================================ */
+const ICONS = {
+  clock: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>',
+  eye: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>',
+  alertTriangle: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 4.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9.5" x2="12" y2="13.5"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  flame: '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M8.5 14.5a2.5 2.5 0 0 0 2.5-2.5c0-1.4-.5-2-1-3-1-2 0-4 2-6 .5 2.5 2 5 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+  truck: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="14" height="12" rx="1"/><path d="M15 9h4l4 3v4h-8"/><circle cx="6" cy="19" r="2"/><circle cx="17.5" cy="19" r="2"/></svg>',
+  lock: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M7.5 11V7.5a4.5 4.5 0 0 1 9 0V11"/></svg>',
+  refresh: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 4 2 10 8 10"/><path d="M4 15a9 9 0 1 0 2-9.5L2 10"/></svg>',
+  star: '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3"/></svg>',
+  check: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>',
+  checkCircle: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 10.8 15 16 9.5"/></svg>',
+  x: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>'
+};
+
 /* Baut das Markup für das Produktbild: echtes Foto (p.photo), falls
    gesetzt, sonst automatisch das Emoji als Fallback – so bricht nichts,
    solange noch nicht für jedes Produkt ein Foto hinterlegt ist.
@@ -59,7 +77,7 @@ const PRODUCTS = [
   },
   {
     id: 'smartwatch', name: 'Smart Watch Pro', emoji: '⌚',
-    badge: '🔥 HEISS', badgeClass: 'hot',
+    badge: 'HEISS', badgeClass: 'hot',
     ratingStars: '★★★★☆', ratingText: '4.7 – 1.892 Bewertungen',
     newPrice: 99.99, oldPrice: 349.99, uvp: 499.99, discountReal: '-71%', discountInflated: '-80%',
     desc: 'Die ultimative Smartwatch mit GPS, Herzfrequenzmesser und 7 Tagen Akkulaufzeit.',
@@ -83,7 +101,7 @@ const PRODUCTS = [
   },
   {
     id: 'sneaker', name: 'Sneaker Limited Edition', emoji: '👟',
-    badge: '🔥 LIMITIERT', badgeClass: 'hot',
+    badge: 'LIMITIERT', badgeClass: 'hot',
     ratingStars: '★★★★★', ratingText: '4.9 – 743 Bewertungen',
     newPrice: 54.99, oldPrice: 179.99, uvp: 259.99, discountReal: '-70%', discountInflated: '-80%',
     desc: 'Exklusive Limited-Edition-Sneaker. Nur 500 Paar weltweit. Sammlerstück!',
@@ -160,6 +178,7 @@ function productToDetailShape(p) {
     image: p.emoji,
     photo: p.photo,
     badge: p.badge,
+    badgeClass: p.badgeClass,
     rating: p.ratingStars + ' <span>(' + p.ratingText + ')</span>',
     oldPrice: euro(p.oldPrice),
     newPrice: euro(p.newPrice),
@@ -167,8 +186,9 @@ function productToDetailShape(p) {
     discount: p.discountInflated,
     realDiscount: p.discountReal,
     desc: p.desc,
-    stock: '⚠️ Nur noch ' + p.stockLeft + ' auf Lager!',
-    social: '👥 ' + p.viewers + ' Personen schauen sich dieses Produkt an',
+    stock: 'Nur noch ' + p.stockLeft + ' auf Lager!',
+    social: p.viewers + ' Personen schauen sich dieses Produkt an',
+    timerStart: p.timerStart,
     colors: p.colors
   };
 }

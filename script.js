@@ -400,13 +400,14 @@ function colorSwatchesHTML(productId, colorIds, selectedId) {
 
 function renderProductCard(p) {
   const defaultColor = p.colors[0];
+  const badgeIcon = p.badgeClass === 'hot' ? ICONS.flame : '';
   const badgeHtml = p.badge
-    ? '<div class="product-badge' + (p.badgeClass ? ' ' + p.badgeClass : '') + '">' + p.badge + '</div>'
+    ? '<div class="product-badge' + (p.badgeClass ? ' ' + p.badgeClass : '') + '">' + badgeIcon + '<span>' + p.badge + '</span></div>'
     : '';
   return `
     <div class="product-card" data-product="${p.id}" data-selected-color="${defaultColor}">
       ${badgeHtml}
-      <div class="product-stock-low">⚠️ Nur noch ${p.stockLeft} auf Lager!</div>
+      <div class="product-stock-low">${ICONS.alertTriangle}<span>Nur noch ${p.stockLeft} auf Lager!</span></div>
       <div class="product-image" style="background:${colorTint(defaultColor)}">${productImageHTML(p)}</div>
       <h3>${p.name}</h3>
       <div class="product-rating">${p.ratingStars} <span>(${p.ratingText})</span></div>
@@ -417,8 +418,8 @@ function renderProductCard(p) {
         <span class="discount">${p.discountReal}</span>
       </div>
       <p class="product-desc">${p.desc}</p>
-      <div class="product-social">👥 ${p.viewers} Personen schauen sich dieses Produkt an</div>
-      <div class="product-timer">⏱️ Deal endet in <span class="product-countdown">${p.timerStart}</span></div>
+      <div class="product-social">${ICONS.eye}<span>${p.viewers} Personen schauen sich dieses Produkt an</span></div>
+      <div class="product-timer">${ICONS.clock}<span>Deal endet in <span class="product-countdown">${p.timerStart}</span></span></div>
       <a href="product.html?id=${p.id}" class="btn-product">Details ansehen</a>
       <button class="btn-add-cart" onclick="addToCartFromCard('${p.id}')">In den Warenkorb</button>
     </div>`;
@@ -451,10 +452,21 @@ function addToCartFromCard(productId) {
   addToCart(p.name, p.newPrice, p.emoji, productId, color);
 }
 
+/* Füllt jedes Element mit [data-icon="name"] automatisch mit dem
+   passenden SVG aus ICONS (products.js) – so reicht im HTML ein
+   Platzhalter, ganz ohne Emoji. */
+function initStaticIcons() {
+  document.querySelectorAll('[data-icon]').forEach(function (el) {
+    const name = el.dataset.icon;
+    if (typeof ICONS !== 'undefined' && ICONS[name]) el.innerHTML = ICONS[name];
+  });
+}
+
 /* ============================================================
    INIT – läuft auf jeder Seite
    ============================================================ */
 document.addEventListener('DOMContentLoaded', function () {
+  initStaticIcons();
   renderProductGrid(); // muss vor Studien-Skript & Countdown-Init laufen
   updateNavCart();
   initAllCountdowns();
