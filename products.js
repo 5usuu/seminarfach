@@ -162,6 +162,30 @@ const PRODUCTS = [
     newPrice: 12.99, oldPrice: 19.99, uvp: 29.99, discountReal: '-35%', discountInflated: '-57%',
     desc: 'Auslaufsichere Edelstahl-Trinkflasche, 750ml, hält 12h kalt.',
     stockLeft: 20, viewers: 9, timerStart: '08:15:30', colors: ALL_COLOR_IDS, photo: ''
+  },
+  {
+    id: 'hose', name: 'Campus Jogginghose', emoji: '👖',
+    badge: 'NEU', badgeClass: 'new',
+    ratingStars: '★★★★☆', ratingText: '4.5 – 178 Bewertungen',
+    newPrice: 29.99, oldPrice: 49.99, uvp: 69.99, discountReal: '-40%', discountInflated: '-57%',
+    desc: 'Bequeme Jogginghose mit elastischem Bund und gesticktem Campus-Logo. Perfekt für Uni und Freizeit.',
+    stockLeft: 10, viewers: 22, timerStart: '03:45:12', colors: ALL_COLOR_IDS, photo: ''
+  },
+  {
+    id: 'hemd', name: 'Flanell-Hemd', emoji: '👔',
+    badge: '', badgeClass: '',
+    ratingStars: '★★★★☆', ratingText: '4.4 – 96 Bewertungen',
+    newPrice: 34.99, oldPrice: 54.99, uvp: 74.99, discountReal: '-36%', discountInflated: '-53%',
+    desc: 'Kariertes Flanell-Hemd aus weicher Baumwolle. Lässig und vielseitig kombinierbar.',
+    stockLeft: 9, viewers: 15, timerStart: '05:33:47', colors: ALL_COLOR_IDS, photo: ''
+  },
+  {
+    id: 'cargohose', name: 'Cargo-Hose Utility', emoji: '👖',
+    badge: 'BESTSELLER', badgeClass: '',
+    ratingStars: '★★★★★', ratingText: '4.6 – 241 Bewertungen',
+    newPrice: 39.99, oldPrice: 64.99, uvp: 89.99, discountReal: '-38%', discountInflated: '-56%',
+    desc: 'Robuste Cargo-Hose mit praktischen Seitentaschen. Der Streetwear-Klassiker.',
+    stockLeft: 6, viewers: 38, timerStart: '01:12:39', colors: ALL_COLOR_IDS, photo: ''
   }
 ];
 
@@ -172,14 +196,19 @@ PRODUCTS.forEach(p => { PRODUCTS_BY_ID[p.id] = p; });
    Produktdetailseite (product.html) erwartet (Preise als fertig
    formatierte Euro-Strings, Rating als HTML-String, etc.) */
 function productToDetailShape(p) {
+  const ratingParts = p.ratingText.split(' – '); // z.B. "4.6 – 3.102 Bewertungen"
   return {
     id: p.id,
     name: p.name,
+    emoji: p.emoji,
     image: p.emoji,
     photo: p.photo,
     badge: p.badge,
     badgeClass: p.badgeClass,
     rating: p.ratingStars + ' <span>(' + p.ratingText + ')</span>',
+    ratingStars: p.ratingStars,
+    ratingValue: ratingParts[0] || p.ratingText,
+    ratingCountText: ratingParts[1] || '',
     oldPrice: euro(p.oldPrice),
     newPrice: euro(p.newPrice),
     uvp: euro(p.uvp),
@@ -191,4 +220,57 @@ function productToDetailShape(p) {
     timerStart: p.timerStart,
     colors: p.colors
   };
+}
+
+/* ============================================================
+   BEWERTUNGEN – pro Produkt passend generiert
+   ============================================================
+   Vorher waren die Kundenbewertungen auf der Produktseite fest
+   eincodiert und redeten immer über Kopfhörer ("Klangqualität",
+   "Noise-Cancelling") – auch auf der Seite für z.B. die
+   Trinkflasche. Jetzt werden plausible, produktbezogene
+   Bewertungen aus der echten Produktbeschreibung generiert,
+   und die Bewertungszahl/-anzahl kommt aus den echten
+   Produktdaten (ratingText) statt einem fixen "4.9".
+   ============================================================ */
+const REVIEW_NAME_POOL = [
+  'Sarah M.', 'Michael T.', 'Lisa K.', 'Jonas B.', 'Anna W.',
+  'Tom H.', 'Nina R.', 'Felix S.', 'Julia P.', 'David L.'
+];
+
+const REVIEW_TEMPLATES = [
+  p => `Sehr zufrieden mit meinem Kauf – ${p.name} kam schnell an und die Qualität hat mich positiv überrascht!`,
+  p => `Für den Preis unschlagbar. Kann ${p.name} nur weiterempfehlen, hat alle Erwartungen übertroffen.`,
+  p => `Mein Kumpel hat mir den Shop empfohlen und ich muss sagen: top! ${p.name} ist genau wie beschrieben, teilweise sogar besser.`,
+  p => `${p.desc} Genauso ist es auch angekommen – wirklich empfehlenswert.`,
+  p => `War erst skeptisch wegen des Preises, aber ${p.name} überzeugt auf ganzer Linie. Würde wieder bestellen.`
+];
+
+const REVIEW_DAYS = ['vor 2 Tagen', 'vor 4 Tagen', 'vor 5 Tagen', 'vor 1 Woche', 'vor 2 Wochen'];
+
+function generateReviewsFor(p) {
+  const seed = productsHash(p.id);
+  const reviews = [];
+  for (let i = 0; i < 3; i++) {
+    const nameIdx = (seed + i * 3) % REVIEW_NAME_POOL.length;
+    const templateIdx = (seed + i * 7) % REVIEW_TEMPLATES.length;
+    const dayIdx = (seed + i * 2) % REVIEW_DAYS.length;
+    reviews.push({
+      name: REVIEW_NAME_POOL[nameIdx],
+      text: REVIEW_TEMPLATES[templateIdx](p),
+      date: REVIEW_DAYS[dayIdx]
+    });
+  }
+  return reviews;
+}
+
+// Kleine, deterministische Hash-Funktion (kein Zufall nötig – gleiche
+// Produkt-ID ergibt immer dieselbe Auswahl an Name/Text/Datum)
+function productsHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
 }

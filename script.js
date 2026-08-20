@@ -315,6 +315,18 @@ const CROSS_SELL_DATA = {
   flasche: [
     { name: 'Campus Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' },
     { name: 'Campus Hoodie', price: 34.99, oldPrice: '59,99 €', emoji: '🧥' }
+  ],
+  hose: [
+    { name: 'Campus Hoodie', price: 34.99, oldPrice: '59,99 €', emoji: '🧥' },
+    { name: 'Campus Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' }
+  ],
+  hemd: [
+    { name: 'Campus Jogginghose', price: 29.99, oldPrice: '49,99 €', emoji: '👖' },
+    { name: 'Sonnenbrille Retro', price: 24.99, oldPrice: '69,99 €', emoji: '🕶️' }
+  ],
+  cargohose: [
+    { name: 'Campus T-Shirt', price: 19.99, oldPrice: '34,99 €', emoji: '👕' },
+    { name: 'Sneaker Limited Edition', price: 54.99, oldPrice: '179,99 €', emoji: '👟' }
   ]
 };
 

@@ -184,15 +184,17 @@ function getManipulatedSet() {
   const half = Math.round(n / 2);
 
   // Bei echten Geburtsmonaten (Kennung "1".."12") wird der Rotations-Offset
-  // direkt aus der Monatszahl abgeleitet – das garantiert, dass alle 12
-  // möglichen Fenster-Positionen auch wirklich einmal vorkommen (siehe
-  // Kommentar oben). Bei manuellen Test-Kennungen (?s=irgendwas) wird
-  // stattdessen ein Hash als Ersatz-Offset verwendet – dann bleibt zwar die
-  // Anzahl je "Gruppe" balanciert, aber die Rundum-Balance über alle Monate
-  // gilt logischerweise nur für die echten Monatswerte 1-12.
+  // aus der Monatszahl abgeleitet und dabei proportional über die gesamte
+  // Produktanzahl gespreizt (nicht einfach 1:1 auf "Monat - 1"). Das ist
+  // wichtig, sobald es mehr (oder weniger) als 12 Produkte gibt: Nur so
+  // decken die 12 Monate wirklich alle Fenster-Positionen gleichmäßig ab.
+  // Bei manuellen Test-Kennungen (?s=irgendwas) wird stattdessen ein Hash
+  // als Ersatz-Offset verwendet – die Anzahl je Gruppe bleibt balanciert,
+  // aber die Rundum-Balance über alle Monate gilt logischerweise nur für
+  // die echten Monatswerte 1-12.
   const monthNumber = parseInt(STUDY_KEY, 10);
   const offset = (!isNaN(monthNumber) && String(monthNumber) === STUDY_KEY)
-    ? (monthNumber - 1) % n
+    ? Math.round((monthNumber - 1) * n / 12) % n
     : hashString(STUDY_KEY) % n;
 
   const manipulated = new Set();

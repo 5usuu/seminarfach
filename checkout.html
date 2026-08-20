@@ -79,7 +79,7 @@
 
       <!-- Shipping form -->
       <div class="checkout-section">
-        <h2>Deine Daten</h2>
+        <h2>Versandadresse</h2>
         <form id="checkoutForm" method="POST">
           <div class="form-row">
             <div class="form-group">
@@ -89,6 +89,25 @@
             <div class="form-group">
               <label>Nachname *</label>
               <input type="text" name="nachname" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>E-Mail *</label>
+            <input type="email" name="email" required>
+            <input type="hidden" name="_subject" value="Neue Bestellung SHOPLY">
+          </div>
+          <div class="form-group">
+            <label>Straße und Hausnummer *</label>
+            <input type="text" name="strasse" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>PLZ *</label>
+              <input type="text" name="plz" required>
+            </div>
+            <div class="form-group">
+              <label>Stadt *</label>
+              <input type="text" name="stadt" required>
             </div>
           </div>
 
