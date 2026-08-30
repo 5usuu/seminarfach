@@ -51,17 +51,17 @@
 
 <div class="product-detail-page">
   <div class="product-detail-container">
-    <div class="product-detail-image" id="pdImage">🎧</div>
+    <div class="product-detail-image" id="pdImage">👕</div>
     <div class="product-detail-info">
-      <span class="product-badge" id="pdBadge">BESTSELLER</span>
-      <h1 id="pdName">Premium Kopfhörer X1</h1>
-      <div class="product-rating" id="pdRating">★★★★★ <span>(4.9 – 2.341 Bewertungen)</span></div>
+      <span class="product-badge" id="pdBadge">NEU</span>
+      <h1 id="pdName">GG Hildburghausen T-Shirt</h1>
+      <div class="product-rating" id="pdRating">★★★★☆ <span>(4.4 – 203 Bewertungen)</span></div>
       <div class="product-price" id="pdPrice">
-        <span class="old-price">199,99 €</span>
-        <span class="new-price">59,99 €</span>
-        <span class="discount">-70%</span>
+        <span class="old-price">34,99 €</span>
+        <span class="new-price">19,99 €</span>
+        <span class="discount">-43%</span>
       </div>
-      <p class="product-desc" id="pdDesc">Hochwertige Noise-Cancelling Kopfhörer mit 40h Akkulaufzeit.</p>
+      <p class="product-desc" id="pdDesc">Weiches Baumwoll-T-Shirt mit gesticktem Gymnasium-Georgianum-Wappen.</p>
 
       <!-- FAKE PRICE INFLATION: higher UVP -->
       <div class="price-inflated" id="pdInflated" style="display:none">
@@ -152,38 +152,15 @@
   <div class="reviews-section">
     <h3>Kundenbewertungen</h3>
     <div class="review-summary">
-      <div class="review-big-rating">4.9</div>
+      <div class="review-big-rating" id="reviewBigRating">4.9</div>
       <div>
-        <div class="testimonial-stars">★★★★★</div>
-        <p>Basierend auf 2.341 Bewertungen</p>
+        <div class="testimonial-stars" id="reviewStars">★★★★★</div>
+        <p id="reviewCountText">Basierend auf 2.341 Bewertungen</p>
       </div>
     </div>
-    <div class="review">
-      <div class="review-header">
-        <strong>Sarah M.</strong>
-        <span class="verified">✓ Verifizierter Kauf</span>
-        <span class="testimonial-stars">★★★★★</span>
-      </div>
-      <p>"Einfach fantastisch! Die Klangqualität ist unglaublich und das Design ist super. Hätte ich nie zu diesem Preis erwartet. Absolute Empfehlung!"</p>
-      <span class="review-date">vor 2 Tagen</span>
-    </div>
-    <div class="review">
-      <div class="review-header">
-        <strong>Michael T.</strong>
-        <span class="verified">✓ Verifizierter Kauf</span>
-        <span class="testimonial-stars">★★★★★</span>
-      </div>
-      <p>"Mein Bruder hat mir diesen Shop empfohlen und ich muss sagen – Top! Lieferung war schnell und die Qualität übertrifft alle Erwartungen."</p>
-      <span class="review-date">vor 5 Tagen</span>
-    </div>
-    <div class="review">
-      <div class="review-header">
-        <strong>Lisa K.</strong>
-        <span class="verified">✓ Verifizierter Kauf</span>
-        <span class="testimonial-stars">★★★★★</span>
-      </div>
-      <p>"Ich habe schon viele Kopfhörer ausprobiert, aber diese sind mit Abstand die Besten. Noise-Cancelling funktioniert perfekt!"</p>
-      <span class="review-date">vor 1 Woche</span>
+    <div id="reviewsList">
+      <!-- wird per JS aus products.js (generateReviewsFor) passend zum
+           jeweiligen Produkt befüllt, siehe Inline-Skript unten -->
     </div>
   </div>
 </div>
@@ -199,7 +176,7 @@
   <div class="sticky-info">
     <span class="sticky-emoji" id="stickyEmoji">🎧</span>
     <div>
-      <div class="sticky-name" id="stickyName">Premium Kopfhörer X1</div>
+      <div class="sticky-name" id="stickyName">GG Hildburghausen T-Shirt</div>
       <div class="sticky-price">
         <span class="sticky-old" id="stickyOld">199,99 €</span>
         <span class="sticky-new" id="stickyNew">59,99 €</span>
@@ -245,9 +222,9 @@ PRODUCTS.forEach(function (x) { products[x.id] = productToDetailShape(x); });
 
 var currentProductId;
 const params = new URLSearchParams(window.location.search);
-const productId = params.get('id') || 'kopfhoerer';
+const productId = params.get('id') || 'shirt';
 currentProductId = productId;
-const p = products[productId] || products.kopfhoerer;
+const p = products[productId] || products.shirt;
 window.__shoplyCurrentProduct = p;
 
 document.getElementById('pdImage').innerHTML = productImageHTML(p);
@@ -277,6 +254,31 @@ document.getElementById('pdStock').innerHTML = ICONS.alertTriangle + '<span>' + 
 document.getElementById('pdSocial').innerHTML = ICONS.eye + '<span>' + p.social + '</span>';
 document.getElementById('pdTimer').innerHTML = ICONS.clock + '<span>Deal endet in <span class="product-countdown">' + (p.timerStart || '02:00:00') + '</span></span>';
 document.title = "SHOPLY – " + p.name;
+
+// BEWERTUNGEN (#Reviews): Zusammenfassung + einzelne Bewertungen passend
+// zum jeweiligen Produkt füllen – vorher stand hier immer fest der
+// Kopfhörer-Text ("Klangqualität", "Noise-Cancelling"), egal welches
+// Produkt man sich angesehen hat. Jetzt kommt beides aus den echten
+// Produktdaten (ratingStars/ratingText) bzw. aus generateReviewsFor(p),
+// die die Bewertungen anhand von Produktname/-beschreibung generiert.
+document.getElementById('reviewStars').textContent = p.ratingStars;
+document.getElementById('reviewBigRating').textContent = p.ratingValue;
+document.getElementById('reviewCountText').textContent = 'Basierend auf ' + p.ratingCountText;
+const reviewsListEl = document.getElementById('reviewsList');
+if (reviewsListEl && typeof generateReviewsFor === 'function') {
+  reviewsListEl.innerHTML = generateReviewsFor(p).map(function (r) {
+    return `
+    <div class="review">
+      <div class="review-header">
+        <strong>${r.name}</strong>
+        <span class="verified">✓ Verifizierter Kauf</span>
+        <span class="testimonial-stars">★★★★★</span>
+      </div>
+      <p>"${r.text}"</p>
+      <span class="review-date">${r.date}</span>
+    </div>`;
+  }).join('');
+}
 
 // FARBAUSWAHL
 let selectedColor = (p.colors && p.colors[0]) || 'schwarz';

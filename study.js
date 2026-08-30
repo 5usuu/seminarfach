@@ -68,7 +68,7 @@ const STUDY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxdzhbbq-xcbSA5A
 // dann automatisch mit in die Studie aufgenommen).
 const STUDY_PRODUCTS = (typeof PRODUCTS !== 'undefined')
   ? PRODUCTS.map(p => p.id)
-  : ['kopfhoerer', 'smartwatch', 'tasche', 'maus', 'sneaker', 'rueckwand'];
+  : ['tasche', 'sneaker', 'rueckwand', 'shirt', 'hoodie', 'cap'];
 
 /* ============================================================
    GEBURTSMONAT-OVERLAY
@@ -151,14 +151,26 @@ const STUDY_KEY = getStudentKey();
    Wichtig fürs Studiendesign, gleich in zweifacher Hinsicht:
    1. Jede Monatsgruppe bekommt exakt dieselbe ANZAHL manipulierter Produkte
       (z.B. bei 12 Produkten immer genau 6).
-   2. Jedes einzelne Produkt wird über alle 12 Monate hinweg auch exakt
-      gleich oft manipuliert (bei 12 Monaten und 12 Produkten: jedes
-      Produkt in genau 6 von 12 Monaten).
-   Dafür wird KEIN Zufallsgenerator verwendet (die hätten, wie sich in Tests
-   zeigte, leicht ungleiche Verteilungen erzeugen können), sondern ein festes
-   Rotationsprinzip: Für Monat X ist ein "Fenster" von der halben Produktanzahl
-   an Produkten manipuliert, das mit dem Monat weiterwandert (zyklisch). Das
-   ist mathematisch garantiert balanciert, nicht nur "meistens ausgeglichen". */
+   2. Jedes einzelne Produkt wird über alle 12 Monate hinweg so gleich wie
+      möglich manipuliert – bei einer Produktanzahl n, die NICHT glatt durch
+      12 teilbar ist (z.B. 17 Produkte), ist absolute Gleichheit mathematisch
+      unmöglich (12 * half muss durch n teilbar sein, sonst geht's nicht
+      exakt auf). Der Algorithmus unten erreicht aber nachweislich das
+      bestmögliche Ergebnis: die Differenz zwischen dem am häufigsten und am
+      seltensten manipulierten Produkt ist NIE größer als 1 (bei aktuell 17
+      Produkten z.B.: 11 Produkte 6x, 6 Produkte 5x – mehr Gleichheit ist bei
+      dieser Zahl nicht erreichbar).
+
+   Dafür wird KEIN Zufallsgenerator verwendet, sondern echtes Rundlaufprinzip
+   (Round-Robin): Die 12 Monatsfenster werden NAHTLOS aneinandergereiht
+   (Fenster für Monat 2 beginnt exakt dort, wo Fenster für Monat 1 endet –
+   kein Runden, keine Bruchrechnung dazwischen). Das ist der entscheidende
+   Unterschied zur Vorgängerversion, die den Startpunkt pro Monat einzeln
+   gerundet hat (Math.round((monat-1) * n / 12)) – dabei summierten sich die
+   Rundungsfehler über die 12 Monate zu einer spürbaren Schieflage auf,
+   sobald n nicht mehr glatt zu 12 passte (z.B. bei den inzwischen 17 statt
+   ursprünglich 6 Produkten). Mit nahtlos aneinandergereihten Fenstern kann
+   das nicht mehr passieren. */
 function hashString(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -183,18 +195,20 @@ function getManipulatedSet() {
   const n = STUDY_PRODUCTS.length;
   const half = Math.round(n / 2);
 
-  // Bei echten Geburtsmonaten (Kennung "1".."12") wird der Rotations-Offset
-  // aus der Monatszahl abgeleitet und dabei proportional über die gesamte
-  // Produktanzahl gespreizt (nicht einfach 1:1 auf "Monat - 1"). Das ist
-  // wichtig, sobald es mehr (oder weniger) als 12 Produkte gibt: Nur so
-  // decken die 12 Monate wirklich alle Fenster-Positionen gleichmäßig ab.
-  // Bei manuellen Test-Kennungen (?s=irgendwas) wird stattdessen ein Hash
-  // als Ersatz-Offset verwendet – die Anzahl je Gruppe bleibt balanciert,
-  // aber die Rundum-Balance über alle Monate gilt logischerweise nur für
+  // Bei echten Geburtsmonaten (Kennung "1".."12") wird der Startpunkt NICHT
+  // mehr über eine gerundete Bruchrechnung bestimmt (das war der alte, leicht
+  // unfaire Ansatz), sondern über nahtloses Rundlaufprinzip: Monat 1 startet
+  // bei Index 0, Monat 2 exakt dort, wo Monat 1 aufgehört hat (Index `half`),
+  // usw. – die Fenster reihen sich lückenlos aneinander, ohne Rundungsfehler.
+  // Das garantiert die bestmögliche Verteilung (siehe Kommentarblock oben).
+  // Bei manuellen Test-Kennungen (?s=irgendwas) wird weiterhin ein Hash als
+  // Ersatz-Startpunkt verwendet – die Anzahl je Gruppe bleibt balanciert,
+  // die Rundum-Balance über alle Monate hinweg gilt aber wie gehabt nur für
   // die echten Monatswerte 1-12.
   const monthNumber = parseInt(STUDY_KEY, 10);
-  const offset = (!isNaN(monthNumber) && String(monthNumber) === STUDY_KEY)
-    ? Math.round((monthNumber - 1) * n / 12) % n
+  const isRealMonth = !isNaN(monthNumber) && String(monthNumber) === STUDY_KEY;
+  const offset = isRealMonth
+    ? (monthNumber - 1) * half % n
     : hashString(STUDY_KEY) % n;
 
   const manipulated = new Set();

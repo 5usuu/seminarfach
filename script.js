@@ -268,21 +268,9 @@ function initStickyBar() {
    CROSS-SELL / "Häufig zusammen gekauft"
    ============================================================ */
 const CROSS_SELL_DATA = {
-  kopfhoerer: [
-    { name: 'Ladecase Deluxe', price: 14.99, oldPrice: '24,99 €', emoji: '🔌' },
-    { name: 'Ohrpolster-Set', price: 9.99, oldPrice: '16,99 €', emoji: '🎧' }
-  ],
-  smartwatch: [
-    { name: 'Ersatzarmband Sport', price: 12.99, oldPrice: '19,99 €', emoji: '⌚' },
-    { name: 'Displayschutz 3er-Set', price: 7.99, oldPrice: '12,99 €', emoji: '🛡️' }
-  ],
   tasche: [
     { name: 'Lederpflege-Set', price: 11.99, oldPrice: '18,99 €', emoji: '🧴' },
     { name: 'Schlüsselanhänger Leder', price: 6.99, oldPrice: '11,99 €', emoji: '🔑' }
-  ],
-  maus: [
-    { name: 'Mauspad XXL', price: 8.99, oldPrice: '14,99 €', emoji: '🖥️' },
-    { name: 'Ersatz-Mausfüße', price: 4.99, oldPrice: '8,99 €', emoji: '🔧' }
   ],
   sneaker: [
     { name: 'Schuhpflege-Kit', price: 9.99, oldPrice: '15,99 €', emoji: '🧽' },
@@ -292,41 +280,69 @@ const CROSS_SELL_DATA = {
     { name: 'Regenschutzhülle', price: 9.99, oldPrice: '15,99 €', emoji: '☔' },
     { name: 'Packwürfel-Set', price: 13.99, oldPrice: '21,99 €', emoji: '🧳' }
   ],
-  tastatur: [
-    { name: 'Mauspad XXL', price: 8.99, oldPrice: '14,99 €', emoji: '🖥️' },
-    { name: 'USB-Hub 4-Port', price: 9.99, oldPrice: '16,99 €', emoji: '🔌' }
-  ],
-  sonnenbrille: [
-    { name: 'Brillenetui Hardcase', price: 7.99, oldPrice: '12,99 €', emoji: '👓' },
-    { name: 'Putztuch-Set', price: 3.99, oldPrice: '6,99 €', emoji: '🧻' }
-  ],
   shirt: [
-    { name: 'Campus Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' },
-    { name: 'Campus Trinkflasche', price: 12.99, oldPrice: '19,99 €', emoji: '🍶' }
+    { name: 'GG Hildburghausen Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' },
+    { name: 'GG Hildburghausen Trinkflasche', price: 12.99, oldPrice: '19,99 €', emoji: '🍶' }
   ],
   hoodie: [
-    { name: 'Campus T-Shirt', price: 19.99, oldPrice: '34,99 €', emoji: '👕' },
-    { name: 'Campus Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' }
+    { name: 'GG Hildburghausen T-Shirt', price: 19.99, oldPrice: '34,99 €', emoji: '👕' },
+    { name: 'GG Hildburghausen Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' }
   ],
   cap: [
-    { name: 'Campus T-Shirt', price: 19.99, oldPrice: '34,99 €', emoji: '👕' },
-    { name: 'Campus Trinkflasche', price: 12.99, oldPrice: '19,99 €', emoji: '🍶' }
+    { name: 'GG Hildburghausen T-Shirt', price: 19.99, oldPrice: '34,99 €', emoji: '👕' },
+    { name: 'GG Hildburghausen Trinkflasche', price: 12.99, oldPrice: '19,99 €', emoji: '🍶' }
   ],
   flasche: [
-    { name: 'Campus Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' },
-    { name: 'Campus Hoodie', price: 34.99, oldPrice: '59,99 €', emoji: '🧥' }
+    { name: 'GG Hildburghausen Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' },
+    { name: 'GG Hildburghausen Hoodie', price: 34.99, oldPrice: '59,99 €', emoji: '🧥' }
   ],
   hose: [
-    { name: 'Campus Hoodie', price: 34.99, oldPrice: '59,99 €', emoji: '🧥' },
-    { name: 'Campus Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' }
+    { name: 'GG Hildburghausen Hoodie', price: 34.99, oldPrice: '59,99 €', emoji: '🧥' },
+    { name: 'GG Hildburghausen Cap', price: 14.99, oldPrice: '24,99 €', emoji: '🧢' }
   ],
   hemd: [
-    { name: 'Campus Jogginghose', price: 29.99, oldPrice: '49,99 €', emoji: '👖' },
-    { name: 'Sonnenbrille Retro', price: 24.99, oldPrice: '69,99 €', emoji: '🕶️' }
+    { name: 'GG Hildburghausen Jogginghose', price: 29.99, oldPrice: '49,99 €', emoji: '👖' },
+    { name: 'GG Hildburghausen Beanie', price: 12.99, oldPrice: '19,99 €', emoji: '🧢' }
   ],
   cargohose: [
-    { name: 'Campus T-Shirt', price: 19.99, oldPrice: '34,99 €', emoji: '👕' },
+    { name: 'GG Hildburghausen T-Shirt', price: 19.99, oldPrice: '34,99 €', emoji: '👕' },
     { name: 'Sneaker Limited Edition', price: 54.99, oldPrice: '179,99 €', emoji: '👟' }
+  ],
+  sweatshirt: [
+    { name: 'GG Hildburghausen Jogginghose', price: 29.99, oldPrice: '49,99 €', emoji: '👖' },
+    { name: 'GG Hildburghausen Beanie', price: 12.99, oldPrice: '19,99 €', emoji: '🧢' }
+  ],
+  turnbeutel: [
+    { name: 'GG Hildburghausen Thermobecher', price: 16.99, oldPrice: '27,99 €', emoji: '🥤' },
+    { name: 'GG Hildburghausen Schlüsselanhänger', price: 4.99, oldPrice: '8,99 €', emoji: '🔑' }
+  ],
+  jutebeutel: [
+    { name: 'GG Hildburghausen Notizbuch', price: 7.99, oldPrice: '12,99 €', emoji: '📓' },
+    { name: 'GG Hildburghausen Kaffeetasse', price: 9.99, oldPrice: '15,99 €', emoji: '☕' }
+  ],
+  tasse: [
+    { name: 'GG Hildburghausen Notizbuch', price: 7.99, oldPrice: '12,99 €', emoji: '📓' },
+    { name: 'GG Hildburghausen Thermobecher', price: 16.99, oldPrice: '27,99 €', emoji: '🥤' }
+  ],
+  thermobecher: [
+    { name: 'GG Hildburghausen Kaffeetasse', price: 9.99, oldPrice: '15,99 €', emoji: '☕' },
+    { name: 'GG Hildburghausen Turnbeutel', price: 9.99, oldPrice: '16,99 €', emoji: '🎒' }
+  ],
+  notizbuch: [
+    { name: 'GG Hildburghausen Kaffeetasse', price: 9.99, oldPrice: '15,99 €', emoji: '☕' },
+    { name: 'GG Hildburghausen Jutebeutel', price: 6.99, oldPrice: '11,99 €', emoji: '👜' }
+  ],
+  schluesselanhaenger: [
+    { name: 'GG Hildburghausen Turnbeutel', price: 9.99, oldPrice: '16,99 €', emoji: '🎒' },
+    { name: 'GG Hildburghausen Notizbuch', price: 7.99, oldPrice: '12,99 €', emoji: '📓' }
+  ],
+  beanie: [
+    { name: 'GG Hildburghausen Schal', price: 14.99, oldPrice: '22,99 €', emoji: '🧣' },
+    { name: 'GG Hildburghausen Hoodie', price: 34.99, oldPrice: '59,99 €', emoji: '🧥' }
+  ],
+  schal: [
+    { name: 'GG Hildburghausen Beanie', price: 12.99, oldPrice: '19,99 €', emoji: '🧢' },
+    { name: 'GG Hildburghausen Sweatshirt', price: 29.99, oldPrice: '49,99 €', emoji: '👚' }
   ]
 };
 
