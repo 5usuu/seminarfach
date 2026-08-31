@@ -206,6 +206,7 @@ p { margin: 0 0 1em; }
 }
 .modal h2 { font-size: 1.3rem; }
 .modal-subtitle { color: var(--text-muted); font-size: 0.9rem; margin-top: -0.4em; }
+.form-optional-hint { font-size: 0.78rem; font-weight: 500; color: var(--text-muted); }
 
 .cookie-option {
   display: flex; align-items: center; justify-content: space-between;

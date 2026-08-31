@@ -54,7 +54,7 @@
       <div class="confirmation-icon">✅</div>
       <h2>Bestellung abgeschlossen</h2>
       <p>Das ist eine <strong>Demo-Bestellung</strong> für die Seminarfacharbeit – es wurde keine echte Zahlung verarbeitet und deine Adressdaten wurden an niemanden verschickt.</p>
-      <p class="confirmation-hint">Für die Studie wurde nur festgehalten, <em>welche Produkte</em> in welcher Variante gekauft wurden – ganz ohne deinen Namen oder deine Adresse.</p>
+      <p class="confirmation-hint" id="confirmationHint">Für die Studie wurde nur festgehalten, <em>welche Produkte</em> in welcher Variante gekauft wurden – ganz ohne deinen Namen oder deine Adresse.</p>
       <a href="index.html" class="btn-go-cart" style="display:inline-block;margin-top:1rem">Zurück zum Shop</a>
     </div>
   </div>
@@ -79,21 +79,25 @@
 
       <!-- Shipping form -->
       <div class="checkout-section">
-        <h2>Deine Daten</h2>
+        <h2>Deine Daten <span class="form-optional-hint">(alles optional)</span></h2>
         <form id="checkoutForm" method="POST">
           <div class="form-row">
             <div class="form-group">
-              <label>Vorname *</label>
-              <input type="text" name="vorname" required>
+              <label>Vorname</label>
+              <input type="text" name="vorname" id="checkoutVorname">
             </div>
             <div class="form-group">
-              <label>Nachname *</label>
-              <input type="text" name="nachname" required>
+              <label>Nachname</label>
+              <input type="text" name="nachname" id="checkoutNachname">
             </div>
           </div>
           <div class="form-group">
-            <label>E-Mail *</label>
-            <input type="email" name="email" required>
+            <label>Klasse</label>
+            <input type="text" name="klasse" id="checkoutKlasse" placeholder="z.B. 10c">
+          </div>
+          <div class="form-group">
+            <label>E-Mail</label>
+            <input type="email" name="email">
             <input type="hidden" name="_subject" value="Neue Bestellung SHOPLY">
           </div>
 
@@ -328,11 +332,32 @@ function finalizeOrder() {
 
   trackInteraction('order_finalize', { items: cart.map(i => i.name), total: document.getElementById('totalPrice').textContent });
 
+  // Falls freiwillig ein Name eingegeben wurde: ab jetzt diesen statt der
+  // automatischen Monats-Kennung fürs Tracking verwenden (siehe
+  // overrideStudentIdWithName in study.js). Beide Felder sind optional,
+  // daher wird nur überschrieben, wenn tatsächlich etwas drinsteht.
+  const vorname = (document.getElementById('checkoutVorname').value || '').trim();
+  const nachname = (document.getElementById('checkoutNachname').value || '').trim();
+  const klasse = (document.getElementById('checkoutKlasse').value || '').trim();
+  const fullName = (vorname + ' ' + nachname).trim();
+  if (fullName && typeof overrideStudentIdWithName === 'function') {
+    overrideStudentIdWithName(fullName);
+  }
+  // Hinweistext auf der Bestätigungsseite muss ehrlich bleiben: nur "ganz
+  // ohne deinen Namen" behaupten, wenn tatsächlich keiner eingegeben wurde.
+  const hintEl = document.getElementById('confirmationHint');
+  if (hintEl && fullName) {
+    hintEl.innerHTML = 'Für die Studie wurde festgehalten, <em>welche Produkte</em> in welcher Variante gekauft wurden – unter dem von dir angegebenen Namen.';
+  }
+
   // STUDIE: für jedes der 6 Hauptprodukte im Warenkorb ein "purchase"-Event senden
   if (typeof trackStudyEvent === 'function') {
     cart.forEach(function (item) {
       if (item.productId) {
-        trackStudyEvent('purchase', item.productId, { price: item.price, name: item.name, color: item.color || null });
+        trackStudyEvent('purchase', item.productId, {
+          price: item.price, name: item.name, color: item.color || null,
+          klasse: klasse || null // optionales Feld, landet in der Zusatzinfo-Spalte im Sheet
+        });
       }
     });
   }
@@ -346,10 +371,11 @@ function finalizeOrder() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Die native Pflichtfeld-Validierung (required-Attribute) läuft weiterhin ganz
-// normal beim Klick auf "Jetzt kostenpflichtig bestellen". Erst wenn alle
-// Felder gültig sind, feuert der "submit"-Event – hier wird dann die echte
-// Netzwerk-Übertragung verhindert und stattdessen finalizeOrder() ausgeführt.
+// Alle Felder (Name, Klasse, E-Mail) sind optional – es gibt keine
+// required-Attribute mehr, die Bestellung geht also auch komplett leer
+// durch. Trotzdem submit() statt direkt onclick, damit z.B. das
+// E-Mail-Feld (type="email") bei AUSGEFÜLLTEM, aber ungültigem Format
+// weiterhin die native Browser-Fehlermeldung zeigt.
 document.getElementById('checkoutForm').addEventListener('submit', function (e) {
   e.preventDefault();
   finalizeOrder();

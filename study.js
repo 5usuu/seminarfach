@@ -156,8 +156,24 @@ function getStudentKey() {
   return localStorage.getItem('shoply_study_month') || STUDY_ID;
 }
 
-const STUDY_ID = getStudentId();
-const STUDY_KEY = getStudentKey();
+let STUDY_ID = getStudentId();
+const STUDY_KEY = getStudentKey(); // bleibt fix – bestimmt weiterhin die faire Varianten-Zuordnung, unabhängig von einem später eingegebenen Namen
+
+/* Wird beim Bestellabschluss aufgerufen (siehe checkout.html), falls die
+   Person freiwillig ihren Namen eingegeben hat: Ab diesem Punkt wird
+   dieser Name statt der automatischen "monat-X-XXXX"-Kennung an das
+   Google Sheet gesendet – so lässt sich, wenn gewünscht, per Namen
+   nachvollziehen, wer was gekauft hat. Bereits VOR diesem Aufruf
+   gesendete Events (Seitenaufrufe, Warenkorb-Klicks etc.) bleiben unter
+   der ursprünglichen Kennung, nur die Käufe ab jetzt nutzen den Namen.
+   STUDY_KEY (Varianten-Zuordnung, s.o.) bleibt davon unberührt. */
+function overrideStudentIdWithName(fullName) {
+  if (!fullName) return;
+  const cleaned = fullName.trim().slice(0, 60); // simple Längenbegrenzung
+  if (!cleaned) return;
+  STUDY_ID = 'name-' + cleaned;
+  localStorage.setItem('shoply_study_id', STUDY_ID);
+}
 
 /* ---------- Deterministische, FAIR BALANCIERTE Varianten-Zuordnung ----------
    Wichtig fürs Studiendesign, gleich in zweifacher Hinsicht:
