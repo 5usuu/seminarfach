@@ -298,6 +298,7 @@ function removeItem(index) {
 
 function acceptSub() {
   trackInteraction('subscription_accepted', {});
+  localStorage.setItem('shoply_premium_decision', 'accepted');
   document.getElementById('subAccept').textContent = '✓ Premium aktiviert!';
   document.getElementById('subAccept').classList.add('activated');
   document.getElementById('subDecline').style.display = 'none';
@@ -313,6 +314,7 @@ function closeSubModal(reconsider) {
   if (reconsider) {
     acceptSub();
   } else {
+    localStorage.setItem('shoply_premium_decision', 'declined');
     trackInteraction('subscription_declined_final', {});
   }
 }

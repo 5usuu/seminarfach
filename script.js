@@ -82,7 +82,13 @@ function toggleCartDropdown(event) {
   const dropdown = document.getElementById('cartDropdown');
   if (!dropdown) return;
   updateNavCart();
+  const isOpening = !dropdown.classList.contains('open');
   dropdown.classList.toggle('open');
+  // ROACH MOTEL: der Premium-Trap greift genau in dem Moment, wo die
+  // Person voller Vorfreude ihren Warenkorb öffnet – nicht erst später im
+  // Checkout, wo man schon eher auf der Hut ist. Siehe Abschnitt
+  // "CART PREMIUM UPSELL" weiter unten.
+  if (isOpening) maybeShowCartPremiumUpsell();
 }
 
 /* Close the cart dropdown when clicking anywhere else on the page */
@@ -179,6 +185,137 @@ function hideCookieBanner() {
     }
   });
 })();
+
+/* ============================================================
+   CART PREMIUM UPSELL – "Roach Motel" (Forced Continuity)
+   ============================================================
+   Trick: Der Premium-Vorschlag erscheint NICHT erst im Checkout (wo man
+   schon konzentriert am Bestellen ist), sondern genau dann, wenn die
+   Person zum ersten Mal in dieser Sitzung auf das Warenkorb-Symbol
+   klickt – ein Moment mit wenig Widerstand. Lehnt sie ab, kommt ein
+   Guilt-Trip-Zwischenschritt (großer "Doch aktivieren"-Button, winziger
+   Ablehnen-Link) – exakt dieselbe Masche wie beim Confirmshaming-Exit-
+   Popup auf der Produktseite. Die Entscheidung wird in localStorage
+   gemerkt (shoply_premium_decision: 'accepted' | 'declined'), damit sie
+   nicht bei jedem Warenkorb-Klick erneut nervt UND damit der bereits
+   bestehende Premium-Kasten im Checkout (siehe checkout.html) den
+   gleichen Stand anzeigt statt nochmal zu fragen. */
+
+function buildCartPremiumOverlays() {
+  if (document.getElementById('cartPremiumOverlay')) return; // schon gebaut
+
+  const upsell = document.createElement('div');
+  upsell.id = 'cartPremiumOverlay';
+  upsell.className = 'modal-overlay';
+  upsell.style.display = 'none';
+  upsell.innerHTML = `
+    <div class="modal subscription-modal">
+      <div class="sub-header">
+        <h3>🌟 SHOPLY Premium Mitgliedschaft</h3>
+        <span class="sub-badge">EMPFOHLEN</span>
+      </div>
+      <p>Bevor's weitergeht: Mit deiner Bestellung erhältst du <strong>30 Tage kostenlosen Zugang</strong> zu SHOPLY Premium!</p>
+      <ul class="sub-benefits">
+        <li><span class="li-icon" data-icon="check"></span>Kostenloser Express-Versand bei jeder Bestellung</li>
+        <li><span class="li-icon" data-icon="check"></span>Exklusive Premium-Rabatte bis zu 80%</li>
+        <li><span class="li-icon" data-icon="check"></span>Früher Zugang zu Flash Sales</li>
+        <li><span class="li-icon" data-icon="check"></span>Persönlicher Einkaufsberater</li>
+      </ul>
+      <div class="sub-choice">
+        <button type="button" class="btn-sub-accept" id="cartSubAccept" onclick="acceptCartPremium()">Ja, ich möchte Premium!</button>
+        <button type="button" class="btn-sub-decline" id="cartSubDecline" onclick="declineCartPremium()">Nein danke</button>
+      </div>
+      <p class="sub-fine-print">* Nach 30 Tagen: 9,99 €/Monat. Kündigung nur telefonisch während der Geschäftszeiten (Mo-Fr 9-17 Uhr) oder per Einschreiben.</p>
+    </div>`;
+  document.body.appendChild(upsell);
+  if (typeof initStaticIcons === 'function') initStaticIcons();
+
+  const guilt = document.createElement('div');
+  guilt.id = 'cartSubDeclineModal';
+  guilt.className = 'modal-overlay';
+  guilt.style.display = 'none';
+  guilt.innerHTML = `
+    <div class="modal exit-modal">
+      <h2>😟 Bist du dir sicher?</h2>
+      <p>Mit SHOPLY Premium sparst du durchschnittlich <strong>47 € pro Monat</strong>. Möchtest du das wirklich verpassen?</p>
+      <div class="sub-modal-benefits">
+        <p>✗ Kein kostenloser Express-Versand</p>
+        <p>✗ Keine exklusiven Premium-Rabatte</p>
+        <p>✗ Kein früher Zugang zu Sales</p>
+        <p>✗ Kein persönlicher Einkaufsberater</p>
+      </div>
+      <button class="btn-stay" onclick="closeCartSubModal(true)">Doch Premium aktivieren!</button>
+      <a href="#" class="exit-leave" onclick="closeCartSubModal(false)">Nein, ich bin zu dumm zum Sparen</a>
+    </div>`;
+  document.body.appendChild(guilt);
+}
+
+function maybeShowCartPremiumUpsell() {
+  if (cart.length === 0) return; // bei leerem Warenkorb ergibt das Angebot keinen Sinn
+  if (localStorage.getItem('shoply_premium_decision')) return; // schon entschieden
+  if (window.__shoplyCartPremiumShown) return; // schon in dieser Sitzung gezeigt
+  window.__shoplyCartPremiumShown = true;
+
+  buildCartPremiumOverlays();
+  document.getElementById('cartPremiumOverlay').style.display = 'flex';
+  trackInteraction('cart_premium_shown', {});
+  if (typeof trackStudyEvent === 'function') trackStudyEvent('cart_premium_shown', null, {});
+}
+
+function acceptCartPremium() {
+  localStorage.setItem('shoply_premium_decision', 'accepted');
+  document.getElementById('cartPremiumOverlay').style.display = 'none';
+  trackInteraction('cart_premium_accepted', {});
+  if (typeof trackStudyEvent === 'function') trackStudyEvent('cart_premium_accepted', null, {});
+  syncCheckoutSubscriptionUI();
+}
+
+function declineCartPremium() {
+  trackInteraction('cart_premium_decline_click', {});
+  if (typeof trackStudyEvent === 'function') trackStudyEvent('cart_premium_decline_click', null, {});
+  document.getElementById('cartSubDeclineModal').style.display = 'flex';
+}
+
+function closeCartSubModal(reconsider) {
+  document.getElementById('cartSubDeclineModal').style.display = 'none';
+  if (reconsider) {
+    acceptCartPremium();
+    return;
+  }
+  localStorage.setItem('shoply_premium_decision', 'declined');
+  document.getElementById('cartPremiumOverlay').style.display = 'none';
+  trackInteraction('cart_premium_declined_final', {});
+  if (typeof trackStudyEvent === 'function') trackStudyEvent('cart_premium_declined_final', null, {});
+  syncCheckoutSubscriptionUI();
+}
+
+/* Spiegelt eine bereits (am Warenkorb) getroffene Premium-Entscheidung im
+   bestehenden Subscription-Kasten auf der Checkout-Seite (siehe
+   checkout.html), damit dort nicht ein zweites Mal gefragt wird. Auf
+   Seiten ohne diesen Kasten (index.html, product.html) passiert einfach
+   nichts. */
+function syncCheckoutSubscriptionUI() {
+  const box = document.querySelector('.subscription-box');
+  if (!box) return;
+  const decision = localStorage.getItem('shoply_premium_decision');
+  const acceptBtn = document.getElementById('subAccept');
+  const declineBtn = document.getElementById('subDecline');
+  if (decision === 'accepted') {
+    if (acceptBtn) {
+      acceptBtn.textContent = '✓ Premium aktiviert!';
+      acceptBtn.classList.add('activated');
+      acceptBtn.disabled = true;
+    }
+    if (declineBtn) declineBtn.style.display = 'none';
+  } else if (decision === 'declined') {
+    const p = document.createElement('p');
+    p.className = 'sub-fine-print';
+    p.textContent = 'Du hast Premium bereits abgelehnt.';
+    if (acceptBtn) acceptBtn.style.display = 'none';
+    if (declineBtn) declineBtn.style.display = 'none';
+    box.appendChild(p);
+  }
+}
 
 /* ============================================================
    COUNTDOWN-TIMER  – "Fake Urgency"
@@ -499,4 +636,5 @@ document.addEventListener('DOMContentLoaded', function () {
   updateNavCart();
   initAllCountdowns();
   renderRecentlyViewed();
+  syncCheckoutSubscriptionUI(); // spiegelt ggf. schon am Warenkorb getroffene Premium-Entscheidung
 });
