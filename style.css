@@ -829,3 +829,40 @@ p { margin: 0 0 1em; }
   .pulse-dot, .ticker { animation: none; }
   html { scroll-behavior: auto; }
 }
+
+/* ============================================================
+   SESSION-TIMER (siehe study.js) – immer sichtbarer Countdown ab
+   Monatswahl, plus Blockier-Overlay bei Zeitablauf.
+   ============================================================ */
+.session-timer-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 700;
+  background: var(--text); color: #fff;
+  text-align: center; padding: 0.5rem 1rem;
+  font-size: 0.85rem; font-weight: 600; letter-spacing: 0.01em;
+}
+.session-timer-bar.session-timer-danger {
+  background: var(--accent);
+  animation: sessionTimerPulse 1s infinite;
+}
+/* Verhindert Überlappung mit der sticky Navbar (position:sticky; top:0),
+   solange der Timer-Balken eingeblendet ist. */
+body.has-session-timer .navbar { top: 2.2rem; }
+body.has-session-timer { padding-top: 2.2rem; }
+@keyframes sessionTimerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.session-expired-modal h2 { color: var(--accent); }
+.session-expired-modal p { font-size: 0.92rem; line-height: 1.5; }
+.session-expired-modal .btn-accept { margin-top: 0.8rem; width: 100%; }
+
+.session-expired-disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-timer-bar.session-timer-danger { animation: none; }
+}

@@ -63,6 +63,13 @@
 // TODO: Nach dem Setup (siehe oben) hier die eigene Apps-Script-Web-App-URL eintragen
 const STUDY_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxdzhbbq-xcbSA5AwcmCwE2u66EzABJyRPYSCz3uIAjckohn1LpnaqsBMBjKc6W7AFi/exec';
 
+// SESSION-TIMER: So lange (in Millisekunden) läuft die Einkaufszeit ab dem
+// Moment der Geburtsmonat-Auswahl. Läuft die Zeit ab, wird der aktuelle
+// Warenkorb automatisch "abgeschickt" (als eigener Event-Typ markiert, siehe
+// Abschnitt "SESSION-TIMER" weiter unten) – die Person kann danach nicht
+// mehr weiter einkaufen.
+const SESSION_DURATION_MS = 10 * 60 * 1000; // 10 Minuten
+
 // Die Hauptprodukte, die Teil der Studie sind – wird automatisch aus
 // products.js übernommen (dort einfach neue Produkte ergänzen, sie werden
 // dann automatisch mit in die Studie aufgenommen).
@@ -106,6 +113,11 @@ function showMonthPicker() {
       const logCode = Math.random().toString(36).slice(2, 6).toUpperCase(); // z.B. "K7F2"
       localStorage.setItem('shoply_study_month', month);
       localStorage.setItem('shoply_study_id', 'monat-' + month + '-' + logCode);
+      // SESSION-TIMER: ab dem Moment der Monatswahl läuft die Einkaufszeit
+      // (siehe Abschnitt "SESSION-TIMER" weiter unten). Wird nur hier gesetzt,
+      // nicht bei manuellen Test-Kennungen (?s=...) – so lässt sich die
+      // Zuordnung weiterhin ohne tickenden Timer testen.
+      localStorage.setItem('shoply_session_deadline', String(Date.now() + SESSION_DURATION_MS));
       window.location.reload();
     });
   });
@@ -323,8 +335,155 @@ function initStudyClickTracking() {
   });
 }
 
+/* ============================================================
+   SESSION-TIMER: 10 Minuten Einkaufszeit ab Monatswahl
+   ============================================================
+   Läuft auf JEDER Seite (index.html, product.html, checkout.html),
+   weil study.js überall eingebunden ist. Drei Aufgaben:
+
+   1. Eine immer sichtbare Anzeige der verbleibenden Zeit (fester
+      Balken oben auf der Seite), die auch Seitenwechsel übersteht,
+      weil die Deadline in localStorage steht (nicht im Skript-Status).
+   2. Läuft die Zeit ab: blockierendes "Zeit abgelaufen"-Overlay, das
+      nicht weggeklickt werden kann, plus Deaktivierung aller
+      Kauf-Buttons ("In den Warenkorb", "Jetzt kaufen") auf der Seite.
+   3. Der zu diesem Zeitpunkt vorhandene Warenkorb wird automatisch
+      als Events verschickt – aber NICHT als normaler 'purchase',
+      sondern als eigener Event-Typ 'timeout_purchase', damit sich
+      diese erzwungenen Abschlüsse in der Auswertung klar von
+      freiwilligen Käufen über den Checkout-Button unterscheiden
+      lassen. Zusätzlich wird immer (auch bei leerem Warenkorb) ein
+      einzelnes 'timeout_reached'-Event gesendet, damit sich auch
+      auszählen lässt, wie viele Personen überhaupt ans Zeitlimit
+      gestoßen sind. Ein localStorage-Flag verhindert, dass das beim
+      nächsten Seitenaufruf (Timer ist ja noch abgelaufen) nochmal
+      passiert. */
+
+function getSessionDeadline() {
+  const raw = localStorage.getItem('shoply_session_deadline');
+  return raw ? parseInt(raw, 10) : null;
+}
+
+function isSessionExpired() {
+  const deadline = getSessionDeadline();
+  return deadline !== null && Date.now() >= deadline;
+}
+
+function formatCountdown(msRemaining) {
+  const totalSeconds = Math.max(0, Math.ceil(msRemaining / 1000));
+  const m = Math.floor(totalSeconds / 60);
+  const s = totalSeconds % 60;
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+/* Verschickt den aktuellen Warenkorb als 'timeout_purchase'-Events und
+   räumt danach den Warenkorb leer – läuft NUR einmal pro Session (Flag
+   'shoply_session_timeout_handled' in localStorage). */
+function handleSessionTimeoutOnce() {
+  if (localStorage.getItem('shoply_session_timeout_handled') === '1') return;
+  localStorage.setItem('shoply_session_timeout_handled', '1');
+
+  // 'cart' kommt aus script.js (das vor study.js geladen wird, siehe
+  // Reihenfolge in index.html/product.html/checkout.html).
+  const currentCart = (typeof cart !== 'undefined' && Array.isArray(cart)) ? cart : [];
+
+  currentCart.forEach(function (item) {
+    if (item.productId) {
+      trackStudyEvent('timeout_purchase', item.productId, {
+        price: item.price, name: item.name, color: item.color || null
+      });
+    }
+  });
+
+  // Immer senden, auch wenn der Warenkorb leer war – so lässt sich zählen,
+  // wie viele Personen überhaupt das Zeitlimit erreicht haben.
+  trackStudyEvent('timeout_reached', '', { itemCount: currentCart.length });
+
+  if (typeof cart !== 'undefined') {
+    cart = [];
+    if (typeof saveCart === 'function') saveCart();
+    if (typeof updateNavCart === 'function') updateNavCart();
+  }
+}
+
+/* Blockierendes Overlay – erscheint auf jeder Seite, solange die Session
+   abgelaufen ist (auch nach Reload/Seitenwechsel, nicht nur im Moment des
+   Ablaufs selbst). */
+function showSessionExpiredOverlay() {
+  if (document.getElementById('sessionExpiredOverlay')) return; // schon da
+
+  const overlay = document.createElement('div');
+  overlay.id = 'sessionExpiredOverlay';
+  overlay.className = 'modal-overlay';
+  overlay.innerHTML = `
+    <div class="modal session-expired-modal">
+      <h2>⏰ Zeit abgelaufen!</h2>
+      <p class="modal-subtitle">Deine 10 Minuten Einkaufszeit sind vorbei.</p>
+      <p>Dein bisheriger Warenkorb wurde automatisch abgeschickt (markiert als
+      "Kauf durch Zeitablauf"). Ein weiterer Einkauf ist für diese Sitzung
+      nicht mehr möglich.</p>
+      <button type="button" class="btn-accept" id="sessionExpiredCloseBtn">Verstanden</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  document.getElementById('sessionExpiredCloseBtn').addEventListener('click', function () {
+    overlay.style.display = 'none';
+  });
+
+  // Alle Kauf-Buttons auf der aktuellen Seite deaktivieren, damit nach dem
+  // Schließen des Overlays kein weiterer Einkauf mehr möglich ist.
+  document.querySelectorAll(
+    '.btn-add-cart, .btn-buy-now, .btn-buy-direct, .btn-bundle, .btn-sticky-cart, .btn-final-buy'
+  ).forEach(function (el) {
+    el.disabled = true;
+    el.classList.add('session-expired-disabled');
+  });
+}
+
+/* Fügt den immer sichtbaren Timer-Balken oben auf der Seite ein und hält
+   ihn per Sekundentakt aktuell. */
+function initSessionTimerBar() {
+  const deadline = getSessionDeadline();
+  if (deadline === null) return; // Monat noch nicht gewählt -> noch kein Timer
+
+  const bar = document.createElement('div');
+  bar.id = 'sessionTimerBar';
+  bar.className = 'session-timer-bar';
+  bar.innerHTML = '⏱️ Verbleibende Zeit: <span id="sessionTimerValue">--:--</span>';
+  document.body.appendChild(bar);
+  document.body.classList.add('has-session-timer');
+
+  const valueEl = document.getElementById('sessionTimerValue');
+
+  function tick() {
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) {
+      valueEl.textContent = '00:00';
+      bar.classList.add('session-timer-danger');
+      handleSessionTimeoutOnce();
+      showSessionExpiredOverlay();
+      clearInterval(intervalId);
+      return;
+    }
+    valueEl.textContent = formatCountdown(remaining);
+    if (remaining <= 60000) bar.classList.add('session-timer-danger');
+  }
+
+  tick();
+  const intervalId = setInterval(tick, 1000);
+}
+
 /* ---------- Init ---------- */
 document.addEventListener('DOMContentLoaded', function () {
   applyVariantToProductGrid();
   initStudyClickTracking();
+
+  // SESSION-TIMER: Balken einblenden (falls Deadline existiert) und, falls
+  // die Zeit beim Seitenaufruf schon abgelaufen ist (z.B. nach Reload),
+  // sofort blockieren statt erst eine Sekunde zu warten.
+  if (isSessionExpired()) {
+    handleSessionTimeoutOnce();
+    showSessionExpiredOverlay();
+  } else {
+    initSessionTimerBar();
+  }
 });
