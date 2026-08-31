@@ -54,6 +54,11 @@ const ICONS = {
 /* Baut das Markup für das Produktbild: echtes Foto (p.photo), falls
    gesetzt, sonst automatisch das Emoji als Fallback – so bricht nichts,
    solange noch nicht für jedes Produkt ein Foto hinterlegt ist.
+   WICHTIG: Der Fallback greift auch, wenn "photo" zwar gesetzt ist, die
+   Datei aber (noch) nicht existiert oder nicht lädt (onerror) – z.B. wenn
+   der Pfad schon eingetragen wurde, das Bild selbst aber erst später
+   hochgeladen wird. Ohne das würde stattdessen ein kaputtes Bild-Icon
+   angezeigt.
    Eigene Fotos hinzufügen: Bilddatei in einen "images/"-Ordner neben
    den HTML-Dateien legen und unten bei "photo" den Pfad eintragen,
    z.B. photo: 'images/kopfhoerer.jpg'. */
@@ -61,9 +66,22 @@ function productImageHTML(p, extraAttrs) {
   extraAttrs = extraAttrs || '';
   const fallbackEmoji = p.emoji || p.image || '📦';
   if (p.photo) {
-    return '<img src="' + p.photo + '" alt="' + p.name + '" loading="lazy" ' + extraAttrs + '>';
+    return '<img src="' + p.photo + '" alt="' + p.name + '" loading="lazy" ' + extraAttrs +
+      ' onerror="handleProductImgError(this, \'' + fallbackEmoji + '\')">';
   }
   return '<span class="product-emoji-fallback">' + fallbackEmoji + '</span>';
+}
+
+/* Wird vom onerror-Handler oben aufgerufen, falls ein Produktfoto nicht
+   lädt (404, noch nicht hochgeladen, etc.) – ersetzt das kaputte <img>
+   durch dieselbe Emoji-Darstellung, die auch ohne "photo"-Feld verwendet
+   würde. */
+function handleProductImgError(imgEl, fallbackEmoji) {
+  if (!imgEl || !imgEl.parentNode) return;
+  const span = document.createElement('span');
+  span.className = 'product-emoji-fallback';
+  span.textContent = fallbackEmoji;
+  imgEl.parentNode.replaceChild(span, imgEl);
 }
 
 const PRODUCTS = [
