@@ -1,415 +1,326 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHOPLY – Produkt</title>
-<link rel="stylesheet" href="style.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
-</head>
-<body>
+/* ============================================================
+   SHOPLY – Zentrale Produkt- und Farbdatenbank
+   ============================================================
+   Hier alle Produkte + Farben pflegen – index.html, product.html
+   und checkout.html lesen alle von hier. Neues Produkt hinzufügen
+   = einfach unten einen neuen Eintrag in PRODUCTS ergänzen, keine
+   HTML-Datei muss angefasst werden.
 
-<nav class="navbar">
-  <div class="nav-brand"><a href="index.html" style="text-decoration:none;color:inherit">🛒 SHOPLY</a></div>
-  <div class="nav-links">
-    <a href="index.html">Startseite</a>
-    <a href="index.html#produkte">Produkte</a>
-    <div class="cart-wrapper">
-      <button class="cart-icon-btn" onclick="toggleCartDropdown(event)">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
-        </svg>
-        <span id="cartBadge" class="cart-badge" style="display:none">0</span>
-      </button>
-      <div class="cart-dropdown" id="cartDropdown">
-        <div class="cart-dropdown-header">
-          <h3>🛒 Mein Warenkorb</h3>
-          <span class="cart-count-label" id="cartDropCount">0 Artikel</span>
-        </div>
-        <div class="cart-dropdown-items" id="cartDropItems">
-          <div class="cart-empty-msg">
-            <div class="empty-icon">🛒</div>
-            <p>Dein Warenkorb ist leer</p>
-          </div>
-        </div>
-        <div class="cart-dropdown-footer">
-          <div class="cart-dropdown-total">
-            <span>Gesamtsumme</span>
-            <strong id="cartDropTotal">0,00 €</strong>
-          </div>
-          <a href="checkout.html" class="btn-go-cart">Zum Warenkorb →</a>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="nav-right">
-    <span class="nav-social-proof">👥 <strong>47</strong> Personen shoppen gerade</span>
-  </div>
-</nav>
+   WICHTIG für die Studie: newPrice ist in jeder Variante gleich –
+   nur oldPrice/uvp (Fake-Referenzpreise) werden ausgeblendet, wenn
+   für eine Person die "saubere" Variante gilt (siehe study.js).
+   ============================================================ */
 
-<div class="product-detail-page">
-  <div class="product-detail-container">
-    <div class="product-detail-image" id="pdImage">👕</div>
-    <div class="product-detail-info">
-      <span class="product-badge" id="pdBadge">NEU</span>
-      <h1 id="pdName">GG Hildburghausen T-Shirt</h1>
-      <div class="product-rating" id="pdRating">★★★★☆ <span>(4.4 – 203 Bewertungen)</span></div>
-      <div class="product-price" id="pdPrice">
-        <span class="old-price">34,99 €</span>
-        <span class="new-price">19,99 €</span>
-        <span class="discount">-43%</span>
-      </div>
-      <p class="product-desc" id="pdDesc">Weiches Baumwoll-T-Shirt mit gesticktem Gymnasium-Georgianum-Wappen.</p>
+const COLORS = [
+  { id: 'schwarz', name: 'Schwarz', hex: '#1B1E2B' },
+  { id: 'weiss',   name: 'Weiß',    hex: '#F5F5F0' },
+  { id: 'rot',     name: 'Rot',     hex: '#E8402D' },
+  { id: 'blau',    name: 'Blau',    hex: '#2563EB' },
+  { id: 'gruen',   name: 'Grün',    hex: '#1E9E62' }
+];
+const ALL_COLOR_IDS = COLORS.map(c => c.id);
 
-      <!-- FAKE PRICE INFLATION: higher UVP -->
-      <div class="price-inflated" id="pdInflated" style="display:none">
-        <span class="inflated-label">UVP:</span>
-        <span class="inflated-price" id="pdUvp"></span>
-        <span class="inflated-you-save" id="pdYouSave"></span>
-      </div>
-
-      <div class="product-stock-low" id="pdStock"></div>
-      <div class="product-social" id="pdSocial"></div>
-      <div class="product-timer" id="pdTimer"></div>
-
-      <!-- LIVE SALES COUNTER (#6) -->
-      <div class="live-sales-counter" id="liveSalesCounter" style="display:none">
-        <span class="fire-icon" id="fireIconSlot"></span>
-        <span><span class="counter-num" id="liveSalesCount">37</span>x in den letzten 24 Stunden verkauft</span>
-      </div>
-
-      <!-- FARBAUSWAHL -->
-      <div class="color-selector" id="colorSelector">
-        <label>Farbe: <span id="selectedColorLabel"></span></label>
-        <div class="color-swatches" id="pdColorSwatches"></div>
-      </div>
-
-      <!-- QUANTITY SELECTOR (#2) -->
-      <div class="qty-selector">
-        <label>Menge:</label>
-        <div class="qty-controls">
-          <button onclick="changeQty(-1)">−</button>
-          <input type="number" id="qtyInput" value="2" min="1" max="99" onchange="setQty(parseInt(this.value)||1)">
-          <button onclick="changeQty(1)">+</button>
-        </div>
-      </div>
-
-      <!-- MISDIRECTION: Big add-to-cart, tiny skip -->
-      <div class="purchase-actions">
-        <button class="btn-buy-now" onclick="buyNow()">🛒 IN DEN WARENKORB</button>
-        <button class="btn-buy-direct" onclick="buyDirect()">⚡ JETZT KAUFEN</button>
-        <a href="index.html" class="skip-link">← Zurück zur Übersicht</a>
-      </div>
-
-      <!-- DARK DEFAULTS: Pre-checked extras -->
-      <div class="extras-section">
-        <h4>Empfohlene Erweiterungen</h4>
-        <label class="extra-option">
-          <input type="checkbox" id="extra1" checked onchange="trackExtra('Premium Garantie (+19,99 €)', this.checked)">
-          <span>Premium Garantie (+19,99 €) – <em>Empfohlen!</em></span>
-        </label>
-        <label class="extra-option">
-          <input type="checkbox" id="extra2" checked onchange="trackExtra('Express Versand (+9,99 €)', this.checked)">
-          <span>Express Versand (+9,99 €) – <em>Am beliebtesten</em></span>
-        </label>
-        <label class="extra-option">
-          <input type="checkbox" id="extra3" onchange="trackExtra('Schutzfolie Set (+14,99 €)', this.checked)">
-          <span>Schutzfolie Set (+14,99 €)</span>
-        </label>
-        <label class="extra-option">
-          <input type="checkbox" id="extra4" checked onchange="trackExtra('Newsletter (+0,00 €)', this.checked)">
-          <span>Newsletter abonnieren (+0,00 €)</span>
-        </label>
-      </div>
-    </div>
-  </div>
-
-  <!-- CROSS SELL / FREQUENTLY BOUGHT TOGETHER (#3) -->
-  <div class="cross-sell-section" id="crossSellSection">
-    <h3>🤝 Kunden, die dieses Produkt gekauft haben, kauften auch</h3>
-    <div class="cross-sell-grid" id="crossSellGrid"></div>
-    <div class="cross-sell-bundle">
-      <p>📦 Zusammen kaufen und <strong>sparen</strong>!</p>
-      <div class="bundle-price" id="bundlePrice">Gesamt: 159,98 €</div>
-      <button class="btn-bundle" onclick="addBundleToCart(currentProductId)">Alle in den Warenkorb</button>
-    </div>
-  </div>
-
-  <!-- BAIT AND SWITCH -->
-  <div class="bait-section">
-    <h3>🎁 Exklusives Angebot: SHOPLY Premium kostenlos testen!</h3>
-    <p>Erhalte 30 Tage kostenlosen Zugang zu SHOPLY Premium mit kostenloser Lieferung, exklusiven Rabatten und frühem Zugang zu Sales.</p>
-    <div class="bait-actions">
-      <button class="btn-bait-yes" onclick="acceptPremium()">Ja, ich möchte 30 Tage kostenlos testen!</button>
-      <a href="#" class="btn-bait-no" onclick="declinePremium(event)">Nein, ich möchte keine Vorteile</a>
-    </div>
-    <p class="bait-fine-print">* Nach 30 Tagen wird die Mitgliedschaft automatisch für 9,99 €/Monat verlängert. Jederzeit kündbar... über unseren Kundenservice (Mo-Fr 9-17 Uhr, Wartezeit ca. 25 Min).</p>
-  </div>
-
-  <!-- REVIEWS -->
-  <div class="reviews-section">
-    <h3>Kundenbewertungen</h3>
-    <div class="review-summary">
-      <div class="review-big-rating" id="reviewBigRating">4.9</div>
-      <div>
-        <div class="testimonial-stars" id="reviewStars">★★★★★</div>
-        <p id="reviewCountText">Basierend auf 2.341 Bewertungen</p>
-      </div>
-    </div>
-    <div id="reviewsList">
-      <!-- wird per JS aus products.js (generateReviewsFor) passend zum
-           jeweiligen Produkt befüllt, siehe Inline-Skript unten -->
-    </div>
-  </div>
-</div>
-
-<!-- RECENTLY VIEWED (#4) -->
-<section class="recently-viewed-section" id="recentlyViewedSection">
-  <h3>🕐 Kürzlich angesehene Produkte</h3>
-  <div class="recently-viewed-grid" id="recentlyViewed"></div>
-</section>
-
-<!-- STICKY ADD-TO-CART BAR (#1) -->
-<div class="sticky-cart-bar" id="stickyCartBar">
-  <div class="sticky-info">
-    <span class="sticky-emoji" id="stickyEmoji">🎧</span>
-    <div>
-      <div class="sticky-name" id="stickyName">GG Hildburghausen T-Shirt</div>
-      <div class="sticky-price">
-        <span class="sticky-old" id="stickyOld">199,99 €</span>
-        <span class="sticky-new" id="stickyNew">59,99 €</span>
-      </div>
-    </div>
-  </div>
-  <div class="sticky-actions">
-    <div class="sticky-qty">
-      <button onclick="changeQty(-1)">−</button>
-      <span id="stickyQty">2</span>
-      <button onclick="changeQty(1)">+</button>
-    </div>
-    <button class="btn-sticky-cart" onclick="buyNow()">🛒 In den Warenkorb</button>
-    <button class="btn-sticky-cart" onclick="buyDirect()" style="background:var(--dark)">⚡ Jetzt kaufen</button>
-  </div>
-</div>
-
-<!-- CONFIRMSHAMING EXIT MODAL -->
-<div id="exitModal" class="modal-overlay" style="display:none">
-  <div class="modal exit-modal">
-    <h2>😢 Willst du wirklich gehen?</h2>
-    <p>Du bist nur einen Klick entfernt von dem besten Deal deines Lebens.</p>
-    <p class="exit-stats">⚠️ <strong>3</strong> andere Personen schauen sich gerade dieselbe Seite an. Wenn du gehst, verpasst du dieses Angebot möglicherweise für immer.</p>
-    <button class="btn-stay" onclick="closeExitModal()">Nein, ich bleibe und kaufe!</button>
-    <a href="index.html" class="exit-leave">Ja, ich möchte mein Glück nicht versuchen und das Angebot verpassen</a>
-  </div>
-</div>
-
-<footer class="footer">
-  <div class="footer-bottom">
-    <p>© 2026 SHOPLY. Alle Rechte vorbehalten.</p>
-  </div>
-</footer>
-
-<script src="products.js"></script>
-<script src="script.js"></script>
-<script src="study.js"></script>
-<script>
-// Product data – kommt jetzt zentral aus products.js (PRODUCTS),
-// hier nur noch ins von dieser Seite erwartete Format umgewandelt
-const products = {};
-PRODUCTS.forEach(function (x) { products[x.id] = productToDetailShape(x); });
-
-var currentProductId;
-const params = new URLSearchParams(window.location.search);
-const productId = params.get('id') || 'shirt';
-currentProductId = productId;
-const p = products[productId] || products.shirt;
-window.__shoplyCurrentProduct = p;
-
-document.getElementById('pdImage').innerHTML = productImageHTML(p);
-document.getElementById('pdName').textContent = p.name;
-const pdBadgeEl = document.getElementById('pdBadge');
-if (p.badge) {
-  pdBadgeEl.className = 'product-badge' + (p.badgeClass ? ' ' + p.badgeClass : '');
-  const badgeIcon = p.badgeClass === 'hot' ? ICONS.flame : '';
-  pdBadgeEl.innerHTML = badgeIcon + '<span>' + p.badge + '</span>';
-  pdBadgeEl.style.display = '';
-} else {
-  pdBadgeEl.style.display = 'none';
-}
-document.getElementById('pdRating').innerHTML = p.rating;
-
-// FAKE PRICE INFLATION (#5): show inflated UVP
-document.getElementById('pdPrice').innerHTML = `<span class="old-price">${p.uvp}</span><span class="new-price">${p.newPrice}</span><span class="discount">${p.discount}</span>`;
-document.getElementById('pdInflated').style.display = 'block';
-document.getElementById('pdUvp').textContent = p.uvp;
-const oldNum = parseFloat(p.oldPrice.replace(' €','').replace(',','.'));
-const newNum = parseFloat(p.newPrice.replace(' €','').replace(',','.'));
-const saved = (oldNum - newNum).toFixed(2).replace('.',',');
-document.getElementById('pdYouSave').textContent = `Du sparst ${saved} €`;
-
-document.getElementById('pdDesc').textContent = p.desc;
-document.getElementById('pdStock').innerHTML = ICONS.alertTriangle + '<span>' + p.stock + '</span>';
-document.getElementById('pdSocial').innerHTML = ICONS.eye + '<span>' + p.social + '</span>';
-document.getElementById('pdTimer').innerHTML = ICONS.clock + '<span>Deal endet in <span class="product-countdown">' + (p.timerStart || '02:00:00') + '</span></span>';
-document.title = "SHOPLY – " + p.name;
-
-// BEWERTUNGEN (#Reviews): Zusammenfassung + einzelne Bewertungen passend
-// zum jeweiligen Produkt füllen – vorher stand hier immer fest der
-// Kopfhörer-Text ("Klangqualität", "Noise-Cancelling"), egal welches
-// Produkt man sich angesehen hat. Jetzt kommt beides aus den echten
-// Produktdaten (ratingStars/ratingText) bzw. aus generateReviewsFor(p),
-// die die Bewertungen anhand von Produktname/-beschreibung generiert.
-document.getElementById('reviewStars').textContent = p.ratingStars;
-document.getElementById('reviewBigRating').textContent = p.ratingValue;
-document.getElementById('reviewCountText').textContent = 'Basierend auf ' + p.ratingCountText;
-const reviewsListEl = document.getElementById('reviewsList');
-if (reviewsListEl && typeof generateReviewsFor === 'function') {
-  reviewsListEl.innerHTML = generateReviewsFor(p).map(function (r) {
-    return `
-    <div class="review">
-      <div class="review-header">
-        <strong>${r.name}</strong>
-        <span class="verified">✓ Verifizierter Kauf</span>
-        <span class="testimonial-stars">★★★★★</span>
-      </div>
-      <p>"${r.text}"</p>
-      <span class="review-date">${r.date}</span>
-    </div>`;
-  }).join('');
+function euro(n) {
+  return n.toFixed(2).replace('.', ',') + ' €';
 }
 
-// FARBAUSWAHL
-let selectedColor = (p.colors && p.colors[0]) || 'schwarz';
-window.__shoplySelectedColor = selectedColor;
-function renderColorSwatches() {
-  const wrap = document.getElementById('pdColorSwatches');
-  if (!wrap || !p.colors) return;
-  wrap.innerHTML = p.colors.map(function (cid) {
-    const c = colorById(cid);
-    const active = cid === selectedColor ? ' active' : '';
-    return '<button type="button" class="color-swatch' + active + '" style="background:' + c.hex +
-      '" title="' + c.name + '" onclick="selectDetailColor(\'' + cid + '\')"></button>';
-  }).join('');
-  const labelEl = document.getElementById('selectedColorLabel');
-  if (labelEl) labelEl.textContent = colorById(selectedColor).name;
-}
-function selectDetailColor(cid) {
-  selectedColor = cid;
-  window.__shoplySelectedColor = cid;
-  renderColorSwatches();
-  const imgEl = document.getElementById('pdImage');
-  if (imgEl) imgEl.style.background = colorTint(cid);
-}
-renderColorSwatches();
-document.getElementById('pdImage').style.background = colorTint(selectedColor);
-
-// STICKY BAR populate
-document.getElementById('stickyEmoji').textContent = p.image;
-document.getElementById('stickyName').textContent = p.name;
-document.getElementById('stickyOld').textContent = p.uvp;
-document.getElementById('stickyNew').textContent = p.newPrice;
-
-// LIVE COUNTER init
-document.getElementById('fireIconSlot').innerHTML = ICONS.flame;
-document.getElementById('liveSalesCounter').style.display = 'flex';
-startLiveCounter();
-
-// STUDIE: Dark-Pattern-Elemente entfernen, falls diese Person für
-// dieses Produkt die "normale" (ehrliche) Variante sehen soll
-applyVariantToProductDetail(productId);
-trackStudyEvent('view_product', productId, { color: selectedColor });
-
-// CROSS SELL populate (#3)
-function populateCrossSell() {
-  const csData = CROSS_SELL_DATA[productId];
-  const grid = document.getElementById('crossSellGrid');
-  if (!csData || !grid) { document.getElementById('crossSellSection').style.display='none'; return; }
-
-  let bundleTotal = parseFloat(p.newPrice.replace(' €','').replace(',','.'));
-  let html = '';
-  csData.forEach(function(cs) {
-    html += `
-      <div class="cross-sell-card" data-name="${cs.name}" data-price="${cs.price}" data-emoji="${cs.emoji}" onclick="toggleCrossSell(this)">
-        <div class="cs-check">✓</div>
-        <div class="cs-emoji">${cs.emoji}</div>
-        <div class="cs-name">${cs.name}</div>
-        <div class="cs-price">${cs.price.toFixed(2).replace('.',',')} €</div>
-        <div class="cs-old">${cs.oldPrice}</div>
-      </div>`;
-    bundleTotal += cs.price;
-  });
-  grid.innerHTML = html;
-  document.getElementById('bundlePrice').textContent = 'Gesamt: ' + bundleTotal.toFixed(2).replace('.',',') + ' €';
-}
-populateCrossSell();
-
-// RECENTLY VIEWED track + render (#4)
-trackRecentlyViewed(productId, p.name, p.newPrice.replace(' €',''), p.image);
-renderRecentlyViewed();
-
-// INIT sticky bar (#1)
-initStickyBar();
-
-function buyNow() {
-  const qty = selectedQty;
-  const pricePer = parseFloat(p.newPrice.replace(' €','').replace(',','.'));
-  trackInteraction('add_to_cart_detail', { product: productId, qty: qty, price: pricePer, color: selectedColor });
-  // Add the item qty times to cart
-  for (var i = 0; i < qty; i++) {
-    addToCart(p.name, pricePer, p.image, productId, selectedColor);
-  }
-  document.getElementById('stickyQty').textContent = selectedQty;
+function colorById(id) {
+  return COLORS.find(c => c.id === id) || COLORS[0];
 }
 
-function buyDirect() {
-  trackInteraction('buy_direct_click', { product: productId, qty: selectedQty, color: selectedColor });
-  // Add to cart then go to checkout
-  const pricePer = parseFloat(p.newPrice.replace(' €','').replace(',','.'));
-  for (var i = 0; i < selectedQty; i++) {
-    addToCart(p.name, pricePer, p.image, productId, selectedColor);
-  }
-  window.location.href = 'checkout.html';
+// Leichte Farbeinfärbung für die Emoji-"Produktbilder" (Alpha-Kanal am Hex-Wert)
+function colorTint(id) {
+  return colorById(id).hex + '26';
 }
 
-// Sync sticky qty display with main qty selector
-var origChangeQty = changeQty;
-changeQty = function(delta) {
-  origChangeQty(delta);
-  document.getElementById('stickyQty').textContent = selectedQty;
+/* ============================================================
+   ICON-SET (echte SVG-Icons statt Emoji als funktionale Icons)
+   Schlanke, strichbasierte Icons im Feather-Stil, currentColor
+   ============================================================ */
+const ICONS = {
+  clock: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>',
+  eye: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>',
+  alertTriangle: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.3 4.6 1.9 18a2 2 0 0 0 1.7 3h16.8a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9.5" x2="12" y2="13.5"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  flame: '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M8.5 14.5a2.5 2.5 0 0 0 2.5-2.5c0-1.4-.5-2-1-3-1-2 0-4 2-6 .5 2.5 2 5 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+  truck: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="1" y="4" width="14" height="12" rx="1"/><path d="M15 9h4l4 3v4h-8"/><circle cx="6" cy="19" r="2"/><circle cx="17.5" cy="19" r="2"/></svg>',
+  lock: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M7.5 11V7.5a4.5 4.5 0 0 1 9 0V11"/></svg>',
+  refresh: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="2 4 2 10 8 10"/><path d="M4 15a9 9 0 1 0 2-9.5L2 10"/></svg>',
+  star: '<svg class="ico" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3"/></svg>',
+  check: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>',
+  checkCircle: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="8 12.5 10.8 15 16 9.5"/></svg>',
+  x: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg>'
 };
 
-function acceptPremium() {
-  trackInteraction('premium_accept', { product: productId });
-  alert("Willkommen bei SHOPLY Premium!");
-}
-
-function declinePremium(e) {
-  e.preventDefault();
-  trackInteraction('premium_decline', { product: productId });
-  if (confirm("Bist du sicher? Du verlierst damit kostenlosen Versand, exklusive Rabatte und Early-Access zu allen Sales.")) {
-    alert("Schade. Du kannst Premium jederzeit wieder aktivieren... wenn du es schaffst, die versteckte Option zu finden.");
+/* Baut das Markup für das Produktbild: echtes Foto (p.photo), falls
+   gesetzt, sonst automatisch das Emoji als Fallback – so bricht nichts,
+   solange noch nicht für jedes Produkt ein Foto hinterlegt ist.
+   WICHTIG: Der Fallback greift auch, wenn "photo" zwar gesetzt ist, die
+   Datei aber (noch) nicht existiert oder nicht lädt (onerror) – z.B. wenn
+   der Pfad schon eingetragen wurde, das Bild selbst aber erst später
+   hochgeladen wird. Ohne das würde stattdessen ein kaputtes Bild-Icon
+   angezeigt.
+   Eigene Fotos hinzufügen: Bilddatei in einen "images/"-Ordner neben
+   den HTML-Dateien legen und unten bei "photo" den Pfad eintragen,
+   z.B. photo: 'images/kopfhoerer.jpg'. */
+function productImageHTML(p, extraAttrs) {
+  extraAttrs = extraAttrs || '';
+  const fallbackEmoji = p.emoji || p.image || '📦';
+  if (p.photo) {
+    return '<img src="' + p.photo + '" alt="' + p.name + '" loading="lazy" ' + extraAttrs +
+      ' onerror="handleProductImgError(this, \'' + fallbackEmoji + '\')">';
   }
+  return '<span class="product-emoji-fallback">' + fallbackEmoji + '</span>';
 }
 
-function trackExtra(name, checked) {
-  trackInteraction('extra_toggle', { name: name, checked: checked });
+/* Wird vom onerror-Handler oben aufgerufen, falls ein Produktfoto nicht
+   lädt (404, noch nicht hochgeladen, etc.) – ersetzt das kaputte <img>
+   durch dieselbe Emoji-Darstellung, die auch ohne "photo"-Feld verwendet
+   würde. */
+function handleProductImgError(imgEl, fallbackEmoji) {
+  if (!imgEl || !imgEl.parentNode) return;
+  const span = document.createElement('span');
+  span.className = 'product-emoji-fallback';
+  span.textContent = fallbackEmoji;
+  imgEl.parentNode.replaceChild(span, imgEl);
 }
 
-// Exit intent modal
-document.addEventListener('mouseout', function(e) {
-  if (window.__shoplyStudyNoExitModal) return; // Studie: "saubere" Variante zeigt kein Confirmshaming-Popup
-  if (!e.toElement && !e.relatedTarget && e.clientY < 10) {
-    document.getElementById('exitModal').style.display = 'flex';
-    trackInteraction('exit_intent_shown', { product: productId });
+const PRODUCTS = [
+  {
+    id: 'tasche', name: 'Leder Tasche Deluxe', emoji: '👜',
+    badge: 'NEU', badgeClass: 'new',
+    ratingStars: '★★★★★', ratingText: '4.8 – 967 Bewertungen',
+    newPrice: 79.99, oldPrice: 249.99, uvp: 379.99, discountReal: '-68%', discountInflated: '-80%',
+    desc: 'Handgefertigte Lederhochtasche aus italienischem Leder. Zeitlos elegant.',
+    stockLeft: 5, viewers: 53, timerStart: '03:22:15', colors: ALL_COLOR_IDS, photo: ''
+  },
+  {
+    id: 'sneaker', name: 'Sneaker Limited Edition', emoji: '👟',
+    badge: 'LIMITIERT', badgeClass: 'hot',
+    ratingStars: '★★★★★', ratingText: '4.9 – 743 Bewertungen',
+    newPrice: 54.99, oldPrice: 179.99, uvp: 259.99, discountReal: '-70%', discountInflated: '-80%',
+    desc: 'Exklusive Limited-Edition-Sneaker. Nur 500 Paar weltweit. Sammlerstück!',
+    stockLeft: 1, viewers: 312, timerStart: '00:29:18', colors: ALL_COLOR_IDS, photo: ''
+  },
+  {
+    id: 'rueckwand', name: 'Premium Rückwand 40L', emoji: '🎒',
+    badge: 'NEU', badgeClass: 'new',
+    ratingStars: '★★★★☆', ratingText: '4.5 – 1.234 Bewertungen',
+    newPrice: 39.99, oldPrice: 129.99, uvp: 199.99, discountReal: '-69%', discountInflated: '-80%',
+    desc: 'Wasserdichter Trekkingrucksack mit Laptop-Fach und USB-Ladeport.',
+    stockLeft: 4, viewers: 67, timerStart: '04:15:08', colors: ALL_COLOR_IDS, photo: ''
+  },
+  {
+    id: 'shirt', name: 'GG Hildburghausen T-Shirt', emoji: '👕',
+    badge: 'NEU', badgeClass: 'new',
+    ratingStars: '★★★★☆', ratingText: '4.4 – 203 Bewertungen',
+    newPrice: 19.99, oldPrice: 34.99, uvp: 44.99, discountReal: '-43%', discountInflated: '-56%',
+    desc: 'Weiches Baumwoll-T-Shirt mit gesticktem Gymnasium-Georgianum-Wappen. Fairtrade-zertifiziert.',
+    stockLeft: 12, viewers: 18, timerStart: '06:11:03', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'hoodie', name: 'GG Hildburghausen Hoodie', emoji: '🧥',
+    badge: 'BESTSELLER', badgeClass: '',
+    ratingStars: '★★★★★', ratingText: '4.7 – 356 Bewertungen',
+    newPrice: 34.99, oldPrice: 59.99, uvp: 79.99, discountReal: '-42%', discountInflated: '-56%',
+    desc: 'Kuscheliger Hoodie mit gesticktem Gymnasium-Georgianum-Wappen. Unisex-Schnitt.',
+    stockLeft: 7, viewers: 41, timerStart: '01:58:27', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'cap', name: 'GG Hildburghausen Cap', emoji: '🧢',
+    badge: '', badgeClass: '',
+    ratingStars: '★★★★☆', ratingText: '4.3 – 129 Bewertungen',
+    newPrice: 14.99, oldPrice: 24.99, uvp: 34.99, discountReal: '-40%', discountInflated: '-57%',
+    desc: 'Verstellbare Cap mit gesticktem Gymnasium-Georgianum-Wappen. One Size fits all.',
+    stockLeft: 15, viewers: 12, timerStart: '07:22:55', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'flasche', name: 'GG Hildburghausen Trinkflasche', emoji: '🍶',
+    badge: 'NEU', badgeClass: 'new',
+    ratingStars: '★★★★★', ratingText: '4.9 – 87 Bewertungen',
+    newPrice: 12.99, oldPrice: 19.99, uvp: 29.99, discountReal: '-35%', discountInflated: '-57%',
+    desc: 'Auslaufsichere Edelstahl-Trinkflasche, 750ml, hält 12h kalt, mit graviertem Gymnasium-Georgianum-Wappen.',
+    stockLeft: 20, viewers: 9, timerStart: '08:15:30', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'hose', name: 'GG Hildburghausen Jogginghose', emoji: '👖',
+    badge: 'NEU', badgeClass: 'new',
+    ratingStars: '★★★★☆', ratingText: '4.5 – 178 Bewertungen',
+    newPrice: 29.99, oldPrice: 49.99, uvp: 69.99, discountReal: '-40%', discountInflated: '-57%',
+    desc: 'Bequeme Jogginghose mit elastischem Bund und gesticktem Gymnasium-Georgianum-Wappen. Perfekt für Schule und Freizeit.',
+    stockLeft: 10, viewers: 22, timerStart: '03:45:12', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'hemd', name: 'GG Hildburghausen Flanell-Hemd', emoji: '👔',
+    badge: '', badgeClass: '',
+    ratingStars: '★★★★☆', ratingText: '4.4 – 96 Bewertungen',
+    newPrice: 34.99, oldPrice: 54.99, uvp: 74.99, discountReal: '-36%', discountInflated: '-53%',
+    desc: 'Kariertes Flanell-Hemd aus weicher Baumwolle mit kleinem Gymnasium-Georgianum-Wappen auf der Brust. Lässig und vielseitig kombinierbar.',
+    stockLeft: 9, viewers: 15, timerStart: '05:33:47', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'cargohose', name: 'GG Hildburghausen Cargo-Hose', emoji: '👖',
+    badge: 'BESTSELLER', badgeClass: '',
+    ratingStars: '★★★★★', ratingText: '4.6 – 241 Bewertungen',
+    newPrice: 39.99, oldPrice: 64.99, uvp: 89.99, discountReal: '-38%', discountInflated: '-56%',
+    desc: 'Robuste Cargo-Hose mit praktischen Seitentaschen und aufgesticktem Gymnasium-Georgianum-Wappen. Der Streetwear-Klassiker.',
+    stockLeft: 6, viewers: 38, timerStart: '01:12:39', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'sweatshirt', name: 'GG Hildburghausen Sweatshirt', emoji: '👚',
+    badge: 'BESTSELLER', badgeClass: '',
+    ratingStars: '★★★★★', ratingText: '4.7 – 289 Bewertungen',
+    newPrice: 29.99, oldPrice: 49.99, uvp: 69.99, discountReal: '-40%', discountInflated: '-57%',
+    desc: 'Klassisches Rundhals-Sweatshirt mit gesticktem Gymnasium-Georgianum-Wappen. Schwerer Baumwoll-Fleece, angenehm warm.',
+    stockLeft: 11, viewers: 27, timerStart: '02:33:19', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'turnbeutel', name: 'GG Hildburghausen Turnbeutel', emoji: '🎒',
+    badge: 'NEU', badgeClass: 'new',
+    ratingStars: '★★★★☆', ratingText: '4.5 – 64 Bewertungen',
+    newPrice: 9.99, oldPrice: 16.99, uvp: 24.99, discountReal: '-41%', discountInflated: '-60%',
+    desc: 'Leichter Turnbeutel aus Baumwolle mit Kordelzug und aufgedrucktem Gymnasium-Georgianum-Wappen. Ideal für Sport & Schwimmunterricht.',
+    stockLeft: 25, viewers: 8, timerStart: '09:02:10', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'jutebeutel', name: 'GG Hildburghausen Jutebeutel', emoji: '👜',
+    badge: '', badgeClass: '',
+    ratingStars: '★★★★☆', ratingText: '4.6 – 41 Bewertungen',
+    newPrice: 6.99, oldPrice: 11.99, uvp: 16.99, discountReal: '-42%', discountInflated: '-59%',
+    desc: 'Stabiler Jute-Stoffbeutel mit Gymnasium-Georgianum-Wappen. Praktisch für Bücher, Einkauf oder als Schultasche für unterwegs.',
+    stockLeft: 30, viewers: 6, timerStart: '10:15:44', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'tasse', name: 'GG Hildburghausen Kaffeetasse', emoji: '☕',
+    badge: 'BESTSELLER', badgeClass: '',
+    ratingStars: '★★★★★', ratingText: '4.8 – 156 Bewertungen',
+    newPrice: 9.99, oldPrice: 15.99, uvp: 21.99, discountReal: '-38%', discountInflated: '-55%',
+    desc: 'Klassische Keramiktasse (300ml) mit Gymnasium-Georgianum-Wappen. Spülmaschinen- und mikrowellenfest.',
+    stockLeft: 18, viewers: 14, timerStart: '04:48:52', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'thermobecher', name: 'GG Hildburghausen Thermobecher', emoji: '🥤',
+    badge: 'NEU', badgeClass: 'new',
+    ratingStars: '★★★★☆', ratingText: '4.6 – 52 Bewertungen',
+    newPrice: 16.99, oldPrice: 27.99, uvp: 39.99, discountReal: '-39%', discountInflated: '-58%',
+    desc: 'Doppelwandiger Thermobecher (350ml) mit Gymnasium-Georgianum-Wappen, hält Getränke bis zu 6h warm.',
+    stockLeft: 14, viewers: 11, timerStart: '06:27:36', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'notizbuch', name: 'GG Hildburghausen Notizbuch', emoji: '📓',
+    badge: '', badgeClass: '',
+    ratingStars: '★★★★☆', ratingText: '4.4 – 73 Bewertungen',
+    newPrice: 7.99, oldPrice: 12.99, uvp: 17.99, discountReal: '-38%', discountInflated: '-56%',
+    desc: 'Hardcover-Notizbuch (A5, liniert) mit geprägtem Gymnasium-Georgianum-Wappen auf dem Einband. 120 Seiten.',
+    stockLeft: 22, viewers: 5, timerStart: '11:03:27', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'schluesselanhaenger', name: 'GG Hildburghausen Schlüsselanhänger', emoji: '🔑',
+    badge: '', badgeClass: '',
+    ratingStars: '★★★★★', ratingText: '4.9 – 38 Bewertungen',
+    newPrice: 4.99, oldPrice: 8.99, uvp: 12.99, discountReal: '-44%', discountInflated: '-62%',
+    desc: 'Robuster Metall-Schlüsselanhänger mit graviertem Gymnasium-Georgianum-Wappen.',
+    stockLeft: 35, viewers: 4, timerStart: '12:41:09', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'beanie', name: 'GG Hildburghausen Beanie', emoji: '🧢',
+    badge: 'NEU', badgeClass: 'new',
+    ratingStars: '★★★★☆', ratingText: '4.5 – 47 Bewertungen',
+    newPrice: 12.99, oldPrice: 19.99, uvp: 27.99, discountReal: '-35%', discountInflated: '-54%',
+    desc: 'Warme Strickmütze mit gesticktem Gymnasium-Georgianum-Wappen. One Size, für Herbst & Winter.',
+    stockLeft: 16, viewers: 9, timerStart: '03:59:14', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+  },
+  {
+    id: 'schal', name: 'GG Hildburghausen Schal', emoji: '🧣',
+    badge: '', badgeClass: '',
+    ratingStars: '★★★★☆', ratingText: '4.3 – 29 Bewertungen',
+    newPrice: 14.99, oldPrice: 22.99, uvp: 31.99, discountReal: '-35%', discountInflated: '-53%',
+    desc: 'Kuscheliger Strickschal mit eingewebtem Gymnasium-Georgianum-Wappen. Perfekt für den Schulweg im Winter.',
+    stockLeft: 13, viewers: 7, timerStart: '07:38:52', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
   }
-});
+];
 
-function closeExitModal() {
-  document.getElementById('exitModal').style.display = 'none';
-  trackInteraction('exit_modal_stay', { product: productId });
+const PRODUCTS_BY_ID = {};
+PRODUCTS.forEach(p => { PRODUCTS_BY_ID[p.id] = p; });
+
+/* Wandelt einen PRODUCTS-Eintrag in das Format um, das die
+   Produktdetailseite (product.html) erwartet (Preise als fertig
+   formatierte Euro-Strings, Rating als HTML-String, etc.) */
+function productToDetailShape(p) {
+  const ratingParts = p.ratingText.split(' – '); // z.B. "4.6 – 3.102 Bewertungen"
+  return {
+    id: p.id,
+    name: p.name,
+    emoji: p.emoji,
+    image: p.emoji,
+    photo: p.photo,
+    badge: p.badge,
+    badgeClass: p.badgeClass,
+    rating: p.ratingStars + ' <span>(' + p.ratingText + ')</span>',
+    ratingStars: p.ratingStars,
+    ratingValue: ratingParts[0] || p.ratingText,
+    ratingCountText: ratingParts[1] || '',
+    oldPrice: euro(p.oldPrice),
+    newPrice: euro(p.newPrice),
+    uvp: euro(p.uvp),
+    discount: p.discountInflated,
+    realDiscount: p.discountReal,
+    desc: p.desc,
+    stock: 'Nur noch ' + p.stockLeft + ' auf Lager!',
+    social: p.viewers + ' Personen schauen sich dieses Produkt an',
+    timerStart: p.timerStart,
+    colors: p.colors
+  };
 }
-</script>
-</body>
-</html>
+
+/* ============================================================
+   BEWERTUNGEN – pro Produkt passend generiert
+   ============================================================
+   Vorher waren die Kundenbewertungen auf der Produktseite fest
+   eincodiert und redeten immer über Kopfhörer ("Klangqualität",
+   "Noise-Cancelling") – auch auf der Seite für z.B. die
+   Trinkflasche. Jetzt werden plausible, produktbezogene
+   Bewertungen aus der echten Produktbeschreibung generiert,
+   und die Bewertungszahl/-anzahl kommt aus den echten
+   Produktdaten (ratingText) statt einem fixen "4.9".
+   ============================================================ */
+const REVIEW_NAME_POOL = [
+  'Sarah M.', 'Michael T.', 'Lisa K.', 'Jonas B.', 'Anna W.',
+  'Tom H.', 'Nina R.', 'Felix S.', 'Julia P.', 'David L.'
+];
+
+const REVIEW_TEMPLATES = [
+  p => `Sehr zufrieden mit meinem Kauf – ${p.name} kam schnell an und die Qualität hat mich positiv überrascht!`,
+  p => `Für den Preis unschlagbar. Kann ${p.name} nur weiterempfehlen, hat alle Erwartungen übertroffen.`,
+  p => `Mein Kumpel hat mir den Shop empfohlen und ich muss sagen: top! ${p.name} ist genau wie beschrieben, teilweise sogar besser.`,
+  p => `${p.desc} Genauso ist es auch angekommen – wirklich empfehlenswert.`,
+  p => `War erst skeptisch wegen des Preises, aber ${p.name} überzeugt auf ganzer Linie. Würde wieder bestellen.`
+];
+
+const REVIEW_DAYS = ['vor 2 Tagen', 'vor 4 Tagen', 'vor 5 Tagen', 'vor 1 Woche', 'vor 2 Wochen'];
+
+function generateReviewsFor(p) {
+  const seed = productsHash(p.id);
+  const reviews = [];
+  for (let i = 0; i < 3; i++) {
+    const nameIdx = (seed + i * 3) % REVIEW_NAME_POOL.length;
+    const templateIdx = (seed + i * 7) % REVIEW_TEMPLATES.length;
+    const dayIdx = (seed + i * 2) % REVIEW_DAYS.length;
+    reviews.push({
+      name: REVIEW_NAME_POOL[nameIdx],
+      text: REVIEW_TEMPLATES[templateIdx](p),
+      date: REVIEW_DAYS[dayIdx]
+    });
+  }
+  return reviews;
+}
+
+// Kleine, deterministische Hash-Funktion (kein Zufall nötig – gleiche
+// Produkt-ID ergibt immer dieselbe Auswahl an Name/Text/Datum)
+function productsHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
