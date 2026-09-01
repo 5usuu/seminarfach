@@ -174,12 +174,12 @@ const PRODUCTS = [
     stockLeft: 11, viewers: 27, timerStart: '02:33:19', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
   },
   {
-    id: 'turnbeutel', name: 'GG Hildburghausen Turnbeutel', emoji: '🎒',
+    id: 'turnbeutel', name: 'GG Hildburghausen Sporttasche', emoji: '🎒',
     badge: 'NEU', badgeClass: 'new',
     ratingStars: '★★★★☆', ratingText: '4.5 – 64 Bewertungen',
-    newPrice: 9.99, oldPrice: 16.99, uvp: 24.99, discountReal: '-41%', discountInflated: '-60%',
-    desc: 'Leichter Turnbeutel aus Baumwolle mit Kordelzug und aufgedrucktem Gymnasium-Georgianum-Wappen. Ideal für Sport & Schwimmunterricht.',
-    stockLeft: 25, viewers: 8, timerStart: '09:02:10', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
+    newPrice: 24.99, oldPrice: 39.99, uvp: 54.99, discountReal: '-38%', discountInflated: '-55%',
+    desc: 'Weekender-Sporttasche mit Tragegriffen, abnehmbarem Schultergurt und kleiner Fronttasche. Gymnasium-Georgianum-Wappen auf dem Hauptfach und der Fronttasche.',
+    stockLeft: 12, viewers: 8, timerStart: '09:02:10', colors: ALL_COLOR_IDS, photo: 'images/logo-ggh.png'
   },
   {
     id: 'jutebeutel', name: 'GG Hildburghausen Jutebeutel', emoji: '👜',

@@ -463,14 +463,14 @@ const CROSS_SELL_DATA = {
   ],
   thermobecher: [
     { name: 'GG Hildburghausen Kaffeetasse', price: 9.99, oldPrice: '15,99 €', emoji: '☕' },
-    { name: 'GG Hildburghausen Turnbeutel', price: 9.99, oldPrice: '16,99 €', emoji: '🎒' }
+    { name: 'GG Hildburghausen Sporttasche', price: 24.99, oldPrice: '39,99 €', emoji: '🎒' }
   ],
   notizbuch: [
     { name: 'GG Hildburghausen Kaffeetasse', price: 9.99, oldPrice: '15,99 €', emoji: '☕' },
     { name: 'GG Hildburghausen Jutebeutel', price: 6.99, oldPrice: '11,99 €', emoji: '👜' }
   ],
   schluesselanhaenger: [
-    { name: 'GG Hildburghausen Turnbeutel', price: 9.99, oldPrice: '16,99 €', emoji: '🎒' },
+    { name: 'GG Hildburghausen Sporttasche', price: 24.99, oldPrice: '39,99 €', emoji: '🎒' },
     { name: 'GG Hildburghausen Notizbuch', price: 7.99, oldPrice: '12,99 €', emoji: '📓' }
   ],
   beanie: [
