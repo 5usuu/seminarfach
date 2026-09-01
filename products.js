@@ -90,7 +90,7 @@ const PRODUCTS = [
     badge: 'NEU', badgeClass: 'new',
     ratingStars: '★★★★★', ratingText: '4.8 – 967 Bewertungen',
     newPrice: 79.99, oldPrice: 249.99, uvp: 379.99, discountReal: '-68%', discountInflated: '-80%',
-    desc: 'Handgefertigte Lederhochtasche aus italienischem Leder. Zeitlos elegant.',
+    desc: 'Handgefertigte Ledertasche aus italienischem Leder. Zeitlos elegant.',
     stockLeft: 5, viewers: 53, timerStart: '03:22:15', colors: ALL_COLOR_IDS, photo: ''
   },
   {
@@ -102,7 +102,7 @@ const PRODUCTS = [
     stockLeft: 1, viewers: 312, timerStart: '00:29:18', colors: ALL_COLOR_IDS, photo: ''
   },
   {
-    id: 'rueckwand', name: 'Premium Rückwand 40L', emoji: '🎒',
+    id: 'rueckwand', name: 'Premium Rucksack 40L', emoji: '🎒',
     badge: 'NEU', badgeClass: 'new',
     ratingStars: '★★★★☆', ratingText: '4.5 – 1.234 Bewertungen',
     newPrice: 39.99, oldPrice: 129.99, uvp: 199.99, discountReal: '-69%', discountInflated: '-80%',
