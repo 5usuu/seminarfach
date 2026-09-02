@@ -315,10 +315,17 @@ function selectDetailColor(cid) {
   window.__shoplySelectedColor = cid;
   renderColorSwatches();
   const imgEl = document.getElementById('pdImage');
-  if (imgEl) imgEl.style.background = colorTint(cid);
+  if (imgEl) {
+    imgEl.style.background = colorTint(cid);
+    imgEl.innerHTML = productImageHTML(p, '', cid);
+  }
 }
 renderColorSwatches();
-document.getElementById('pdImage').style.background = colorTint(selectedColor);
+const pdImageEl = document.getElementById('pdImage');
+if (pdImageEl) {
+  pdImageEl.style.background = colorTint(selectedColor);
+  pdImageEl.innerHTML = productImageHTML(p, '', selectedColor);
+}
 
 // STICKY BAR populate
 setEl('stickyEmoji', 'textContent', p.image);

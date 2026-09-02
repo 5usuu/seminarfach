@@ -573,7 +573,7 @@ function renderProductCard(p) {
     <div class="product-card" data-product="${p.id}" data-selected-color="${defaultColor}">
       ${badgeHtml}
       <div class="product-stock-low">${ICONS.alertTriangle}<span>Nur noch ${p.stockLeft} auf Lager!</span></div>
-      <div class="product-image" style="background:${colorTint(defaultColor)}">${productImageHTML(p)}</div>
+      <div class="product-image" style="background:${colorTint(defaultColor)}">${productImageHTML(p, '', defaultColor)}</div>
       <h3>${p.name}</h3>
       <div class="product-rating">${p.ratingStars} <span>(${p.ratingText})</span></div>
       ${colorSwatchesHTML(p.id, p.colors, defaultColor)}
@@ -601,11 +601,18 @@ function selectProductColor(btn, productId) {
   const card = btn.closest('.product-card');
   if (!card) return;
   const cid = btn.dataset.color;
+  const p = PRODUCTS_BY_ID[productId];
   card.dataset.selectedColor = cid;
   card.querySelectorAll('.color-swatch').forEach(function (s) { s.classList.remove('active'); });
   btn.classList.add('active');
-  const img = card.querySelector('.product-image');
-  if (img) img.style.background = colorTint(cid);
+  const imgWrap = card.querySelector('.product-image');
+  if (imgWrap) {
+    imgWrap.style.background = colorTint(cid);
+    // Echtes Foto der gewählten Farbe einsetzen (falls vorhanden), statt
+    // nur den Hintergrund einzufärben – siehe resolveProductPhoto/
+    // productImageHTML in products.js.
+    if (p) imgWrap.innerHTML = productImageHTML(p, '', cid);
+  }
 }
 
 /* "In den Warenkorb" auf der Produktkarte: berücksichtigt die gewählte Farbe */
