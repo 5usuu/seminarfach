@@ -1,5 +1,5 @@
 /* ============================================================
-   SHOPLY – Demo-Shop für die Seminarfacharbeit "Dark Patterns"
+   Georgianum Shop – Demo-Schulshop für die Seminarfacharbeit "Dark Patterns"
    Dieses Skript enthält AUSSCHLIESSLICH Demo-Logik. Es findet
    keine echte Bestellung, kein echtes Tracking und keine
    echte Kommunikation mit einem Server statt (außer dem
@@ -106,7 +106,7 @@ document.addEventListener('click', function (e) {
    damit man beim Vorführen in der Konsole sehen kann, wann welches
    Pattern "greift". */
 function trackInteraction(eventName, data) {
-  console.log('[SHOPLY tracking]', eventName, data || {});
+  console.log('[Georgianum Shop tracking]', eventName, data || {});
 }
 
 /* ============================================================
@@ -211,21 +211,21 @@ function buildCartPremiumOverlays() {
   upsell.innerHTML = `
     <div class="modal subscription-modal">
       <div class="sub-header">
-        <h3>🌟 SHOPLY Premium Mitgliedschaft</h3>
+        <h3>🌟 Georgianum Shop Plus</h3>
         <span class="sub-badge">EMPFOHLEN</span>
       </div>
-      <p>Bevor's weitergeht: Mit deiner Bestellung erhältst du <strong>30 Tage kostenlosen Zugang</strong> zu SHOPLY Premium!</p>
+      <p>Bevor's weitergeht: Mit deiner Bestellung erhältst du <strong>30 Tage kostenlosen Zugang</strong> zu Georgianum Shop Plus!</p>
       <ul class="sub-benefits">
-        <li><span class="li-icon" data-icon="check"></span>Kostenloser Express-Versand bei jeder Bestellung</li>
-        <li><span class="li-icon" data-icon="check"></span>Exklusive Premium-Rabatte bis zu 80%</li>
-        <li><span class="li-icon" data-icon="check"></span>Früher Zugang zu Flash Sales</li>
-        <li><span class="li-icon" data-icon="check"></span>Persönlicher Einkaufsberater</li>
+        <li><span class="li-icon" data-icon="check"></span>Kostenloser Versand bei jeder Bestellung</li>
+        <li><span class="li-icon" data-icon="check"></span>Exklusive Rabatte auf neue Kollektionen</li>
+        <li><span class="li-icon" data-icon="check"></span>Früher Zugang zu neuen Kollektionen</li>
+        <li><span class="li-icon" data-icon="check"></span>Vorrang bei limitierten Artikeln</li>
       </ul>
       <div class="sub-choice">
         <button type="button" class="btn-sub-accept" id="cartSubAccept" onclick="acceptCartPremium()">Ja, ich möchte Premium!</button>
         <button type="button" class="btn-sub-decline" id="cartSubDecline" onclick="declineCartPremium()">Nein danke</button>
       </div>
-      <p class="sub-fine-print">* Nach 30 Tagen: 9,99 €/Monat. Kündigung nur telefonisch während der Geschäftszeiten (Mo-Fr 9-17 Uhr) oder per Einschreiben.</p>
+      <p class="sub-fine-print">* Nach 30 Tagen: 9,99 € pro Halbjahr. Kündigung nur telefonisch während der Geschäftszeiten (Mo-Fr 9-17 Uhr) oder per Einschreiben.</p>
     </div>`;
   document.body.appendChild(upsell);
   if (typeof initStaticIcons === 'function') initStaticIcons();
@@ -237,12 +237,12 @@ function buildCartPremiumOverlays() {
   guilt.innerHTML = `
     <div class="modal exit-modal">
       <h2>😟 Bist du dir sicher?</h2>
-      <p>Mit SHOPLY Premium sparst du durchschnittlich <strong>47 € pro Monat</strong>. Möchtest du das wirklich verpassen?</p>
+      <p>Mit Georgianum Shop Plus sparst du durchschnittlich <strong>25 € pro Halbjahr</strong>. Möchtest du das wirklich verpassen?</p>
       <div class="sub-modal-benefits">
-        <p>✗ Kein kostenloser Express-Versand</p>
-        <p>✗ Keine exklusiven Premium-Rabatte</p>
+        <p>✗ Kein kostenloser Versand</p>
+        <p>✗ Keine exklusiven Rabatte</p>
         <p>✗ Kein früher Zugang zu Sales</p>
-        <p>✗ Kein persönlicher Einkaufsberater</p>
+        <p>✗ Kein Vorrang bei limitierten Artikeln</p>
       </div>
       <button class="btn-stay" onclick="closeCartSubModal(true)">Doch Premium aktivieren!</button>
       <a href="#" class="exit-leave" onclick="closeCartSubModal(false)">Nein, ich bin zu dumm zum Sparen</a>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHOPLY – Produkt</title>
+<title>Georgianum Shop – Produkt</title>
 <link rel="icon" type="image/png" href="logo-ggh.png">
 <link rel="stylesheet" href="style.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,7 +13,7 @@
 <body>
 
 <nav class="navbar">
-  <div class="nav-brand"><a href="index.html" style="text-decoration:none;color:inherit">🛒 SHOPLY</a></div>
+  <div class="nav-brand"><a href="index.html" style="text-decoration:none;color:inherit"><img src="logo-ggh.png" alt="Gymnasium Georgianum Hildburghausen" class="nav-logo">Georgianum Shop</a></div>
   <div class="nav-links">
     <a href="index.html">Startseite</a>
     <a href="index.html#produkte">Produkte</a>
@@ -140,8 +140,8 @@
 
   <!-- BAIT AND SWITCH -->
   <div class="bait-section">
-    <h3>🎁 Exklusives Angebot: SHOPLY Premium kostenlos testen!</h3>
-    <p>Erhalte 30 Tage kostenlosen Zugang zu SHOPLY Premium mit kostenloser Lieferung, exklusiven Rabatten und frühem Zugang zu Sales.</p>
+    <h3>🎁 Exklusives Angebot: Georgianum Shop Plus kostenlos testen!</h3>
+    <p>Erhalte 30 Tage kostenlosen Zugang zu Georgianum Shop Plus mit kostenlosem Versand, exklusiven Rabatten und frühem Zugang zu neuen Kollektionen.</p>
     <div class="bait-actions">
       <button class="btn-bait-yes" onclick="acceptPremium()">Ja, ich möchte 30 Tage kostenlos testen!</button>
       <a href="#" class="btn-bait-no" onclick="declinePremium(event)">Nein, ich möchte keine Vorteile</a>
@@ -208,7 +208,7 @@
 
 <footer class="footer">
   <div class="footer-bottom">
-    <p>© 2026 SHOPLY. Alle Rechte vorbehalten.</p>
+    <p>© 2026 Georgianum Shop. Alle Rechte vorbehalten.</p>
   </div>
 </footer>
 
@@ -236,7 +236,7 @@ window.__shoplyCurrentProduct = p;
 // ausgeführt werden.
 function setEl(id, prop, value) {
   const el = document.getElementById(id);
-  if (!el) { console.warn('[SHOPLY] Element #' + id + ' nicht gefunden – bitte prüfen, ob alle Dateien aktuell sind.'); return; }
+  if (!el) { console.warn('[Georgianum Shop] Element #' + id + ' nicht gefunden – bitte prüfen, ob alle Dateien aktuell sind.'); return; }
   el[prop] = value;
 }
 
@@ -269,7 +269,7 @@ setEl('pdDesc', 'textContent', p.desc);
 setEl('pdStock', 'innerHTML', ICONS.alertTriangle + '<span>' + p.stock + '</span>');
 setEl('pdSocial', 'innerHTML', ICONS.eye + '<span>' + p.social + '</span>');
 setEl('pdTimer', 'innerHTML', ICONS.clock + '<span>Deal endet in <span class="product-countdown">' + (p.timerStart || '02:00:00') + '</span></span>');
-document.title = "SHOPLY – " + p.name;
+document.title = "Georgianum Shop – " + p.name;
 
 // BEWERTUNGEN (#Reviews): Zusammenfassung + einzelne Bewertungen passend
 // zum jeweiligen Produkt füllen – vorher stand hier immer fest der
@@ -406,7 +406,7 @@ changeQty = function(delta) {
 
 function acceptPremium() {
   trackInteraction('premium_accept', { product: productId });
-  alert("Willkommen bei SHOPLY Premium!");
+  alert("Willkommen bei Georgianum Shop Plus!");
 }
 
 function declinePremium(e) {

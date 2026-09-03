@@ -1,5 +1,5 @@
 /* ============================================================
-   SHOPLY Studie – Google Apps Script Backend
+   Georgianum Shop Studie – Google Apps Script Backend
    ============================================================
    Diese Datei gehört NICHT auf GitHub Pages, sondern in den
    Apps-Script-Editor eines Google Sheets:
@@ -21,12 +21,16 @@
    -> "Neue Version" erneut bereitstellen, sonst läuft weiter die
    alte Version!
 
-   ⚠️ WICHTIG BEI DIESEM UPDATE: Zwei neue Spalten sind dazugekommen
-   (Cookie-Anzahl, Cookie-Kategorien). Bitte VOR dem nächsten Test die
-   Tabellenblätter "Events" und "Auswertung" in deinem Sheet komplett
-   löschen (Rechtsklick auf den Reiter unten -> Löschen) – sie werden
-   beim nächsten Event automatisch neu und mit den richtigen Spalten
-   angelegt. Alte Testdaten sonst vorher sichern, falls noch gebraucht.
+   ⚠️ WICHTIG BEI DIESEM UPDATE: Es gibt zwei neue Auswertungs-Zeilen für
+   den Session-Timer (erzwungene Käufe durch Zeitablauf + Anzahl Personen,
+   die das Zeitlimit erreicht haben). Diese werden NUR beim allerersten
+   Event neu angelegt, nicht bei jedem Redeploy. Bitte VOR dem nächsten
+   Test das Tabellenblatt "Auswertung" komplett löschen (Rechtsklick auf
+   den Reiter unten -> Löschen) – es wird beim nächsten Event automatisch
+   neu und mit den zusätzlichen Zeilen angelegt. Das Blatt "Events" kann
+   unangetastet bleiben, die Spalten haben sich nicht geändert. Alte
+   Auswertungs-Formeln gehen beim Löschen nicht verloren, sie berechnen
+   sich ja live aus "Events" neu.
 
    ERGEBNIS: Es entstehen automatisch ZWEI Tabellenblätter:
    - "Events"      -> jede einzelne Aktion als eigene Zeile
@@ -96,7 +100,7 @@ function doGet(e) {
   getOrCreateEventsSheet(ss);
   getOrCreateSummarySheet(ss);
   return ContentService
-    .createTextOutput('SHOPLY-Studie: Web-App ist erreichbar ✔')
+    .createTextOutput('Georgianum Shop Studie: Web-App ist erreichbar ✔')
     .setMimeType(ContentService.MimeType.TEXT);
 }
 
@@ -169,6 +173,20 @@ function getOrCreateSummarySheet(ss) {
     '"select I where D = \'cookie_accept_all\' or D = \'cookie_save_settings\'", 0)), 2), "Noch keine Daten")'
   );
   sheet.getRange('E9').setValue('(5 = alle akzeptiert, 0 = alle abgelehnt)').setFontStyle('italic').setFontColor('#6B7080');
+
+  sheet.getRange('A10').setValue('⏰ Erzwungene Käufe durch Zeitablauf je Produkt & Variante').setFontWeight('bold');
+  sheet.getRange('A11').setFormula(
+    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:L, ' +
+    '"select E, F, count(A) where D = \'timeout_purchase\' and E <> \'\' group by E, F ' +
+    'label E \'Produkt\', F \'Variante\', count(A) \'Erzwungene Käufe\'", 0), "Noch keine Daten")'
+  );
+
+  sheet.getRange('E10').setValue('⏰ Anzahl Personen, die das 10-Minuten-Zeitlimit erreicht haben').setFontWeight('bold');
+  sheet.getRange('E11').setFormula(
+    '=IFERROR(QUERY(' + EVENTS_SHEET_NAME + '!A2:L, ' +
+    '"select count(A) where D = \'timeout_reached\' label count(A) \'Anzahl\'", 0), "Noch keine Daten")'
+  );
+  sheet.getRange('E12').setValue('(1 Eintrag pro Person, unabhängig davon ob ihr Warenkorb leer war oder nicht)').setFontStyle('italic').setFontColor('#6B7080');
 
   sheet.setColumnWidths(1, 14, 130);
   return sheet;

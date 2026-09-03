@@ -1,5 +1,5 @@
 /* ============================================================
-   SHOPLY – Zentrale Produkt- und Farbdatenbank
+   Georgianum Shop – Zentrale Produkt- und Farbdatenbank
    ============================================================
    Hier alle Produkte + Farben pflegen – index.html, product.html
    und checkout.html lesen alle von hier. Neues Produkt hinzufügen
@@ -141,7 +141,7 @@ const PRODUCTS = [
     ratingStars: '★★★★★', ratingText: '4.7 – 356 Bewertungen',
     newPrice: 34.99, oldPrice: 59.99, uvp: 79.99, discountReal: '-42%', discountInflated: '-56%',
     desc: 'Kuscheliger Hoodie mit gesticktem Gymnasium-Georgianum-Wappen. Unisex-Schnitt.',
-    stockLeft: 7, viewers: 41, timerStart: '01:58:27', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_hoodie.jpg', weiss: 'photosold/white_hoodie.jpg', rot: 'photosold/red_hoodie.jpg', blau: 'photosold/blue_hoodie.jpg', gruen: 'photosold/green_hoodie.jpg' }
+    stockLeft: 7, viewers: 41, timerStart: '01:58:27', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_hodie.jpg', weiss: 'photosold/white_hoodie.jpg', rot: 'photosold/red_hoodie.jpg', blau: 'photosold/blue_hoodie.jpg', gruen: 'photosold/green_hoodie.jpg' }
   },
   {
     id: 'cap', name: 'GG Hildburghausen Cap', emoji: '🧢',

@@ -1,5 +1,5 @@
 /* ============================================================
-   SHOPLY – Studien-Tracking für die Seminarfacharbeit
+   Georgianum Shop – Studien-Tracking für die Seminarfacharbeit
    ============================================================
 
    WIE ES FUNKTIONIERT
