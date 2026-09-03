@@ -65,7 +65,7 @@ const ICONS = {
    gesetzt ist, die Datei aber (noch) nicht existiert oder nicht lädt
    (onerror) – z.B. wenn der Pfad schon eingetragen wurde, das Bild
    selbst aber erst später hochgeladen wird.
-   Eigene Fotos hinzufügen: Bilddatei in einen "photosold/"-Ordner neben
+   Eigene Fotos hinzufügen: Bilddatei in einen "photos/"-Ordner neben
    den HTML-Dateien legen und bei "photo" (ein Foto für alle Farben)
    oder "photos" (ein Foto je Farbe) den Pfad eintragen. */
 function resolveProductPhoto(p, colorId) {
@@ -125,7 +125,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.5 – 1.234 Bewertungen',
     newPrice: 39.99, oldPrice: 129.99, uvp: 199.99, discountReal: '-69%', discountInflated: '-80%',
     desc: 'Klassischer Daypack mit gepolsterten Trägern, Tragegriff und großer Fronttasche. Großer "GYMNASIUM GEORGIANUM"-Schriftzug mit GG-Wappen auf der oberen Hälfte.',
-    stockLeft: 4, viewers: 67, timerStart: '04:15:08', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_schoolbag.jpg', weiss: 'photosold/white_schoolbag.jpg', rot: 'photosold/red_schoolbag.jpg', blau: 'photosold/blue_schoolbag.jpg', gruen: 'photosold/green_schoolbag.jpg' }
+    stockLeft: 4, viewers: 67, timerStart: '04:15:08', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_schoolbag.jpg', weiss: 'photos/white_schoolbag.jpg', rot: 'photos/red_schoolbag.jpg', blau: 'photos/blue_schoolbag.jpg', gruen: 'photos/green_schoolbag.jpg' }
   },
   {
     id: 'shirt', name: 'GG Hildburghausen T-Shirt', emoji: '👕',
@@ -133,7 +133,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.4 – 203 Bewertungen',
     newPrice: 19.99, oldPrice: 34.99, uvp: 44.99, discountReal: '-43%', discountInflated: '-56%',
     desc: 'Weiches Baumwoll-T-Shirt mit gesticktem Gymnasium-Georgianum-Wappen. Fairtrade-zertifiziert.',
-    stockLeft: 12, viewers: 18, timerStart: '06:11:03', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_shirt.jpg', weiss: 'photosold/white_shirt.jpg', rot: 'photosold/red_shirt.jpg', blau: 'photosold/blue_shirt.jpg', gruen: 'photosold/green_shirt.jpg' }
+    stockLeft: 12, viewers: 18, timerStart: '06:11:03', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_shirt.jpg', weiss: 'photos/white_shirt.jpg', rot: 'photos/red_shirt.jpg', blau: 'photos/blue_shirt.jpg', gruen: 'photos/green_shirt.jpg' }
   },
   {
     id: 'hoodie', name: 'GG Hildburghausen Hoodie', emoji: '🧥',
@@ -141,7 +141,7 @@ const PRODUCTS = [
     ratingStars: '★★★★★', ratingText: '4.7 – 356 Bewertungen',
     newPrice: 34.99, oldPrice: 59.99, uvp: 79.99, discountReal: '-42%', discountInflated: '-56%',
     desc: 'Kuscheliger Hoodie mit gesticktem Gymnasium-Georgianum-Wappen. Unisex-Schnitt.',
-    stockLeft: 7, viewers: 41, timerStart: '01:58:27', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_hodie.jpg', weiss: 'photosold/white_hoodie.jpg', rot: 'photosold/red_hoodie.jpg', blau: 'photosold/blue_hoodie.jpg', gruen: 'photosold/green_hoodie.jpg' }
+    stockLeft: 7, viewers: 41, timerStart: '01:58:27', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_hodie.jpg', weiss: 'photos/white_hoodie.jpg', rot: 'photos/red_hoodie.jpg', blau: 'photos/blue_hoodie.jpg', gruen: 'photos/green_hoodie.jpg' }
   },
   {
     id: 'cap', name: 'GG Hildburghausen Cap', emoji: '🧢',
@@ -149,7 +149,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.3 – 129 Bewertungen',
     newPrice: 14.99, oldPrice: 24.99, uvp: 34.99, discountReal: '-40%', discountInflated: '-57%',
     desc: 'Verstellbare Cap mit gesticktem Gymnasium-Georgianum-Wappen. One Size fits all.',
-    stockLeft: 15, viewers: 12, timerStart: '07:22:55', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_cap.jpg', weiss: 'photosold/white_cap.jpg', rot: 'photosold/red_cap.jpg', blau: 'photosold/blue_cap.jpg', gruen: 'photosold/green_cap.jpg' }
+    stockLeft: 15, viewers: 12, timerStart: '07:22:55', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_cap.jpg', weiss: 'photos/white_cap.jpg', rot: 'photos/red_cap.jpg', blau: 'photos/blue_cap.jpg', gruen: 'photos/green_cap.jpg' }
   },
   {
     id: 'flasche', name: 'GG Hildburghausen Trinkflasche', emoji: '🍶',
@@ -157,7 +157,7 @@ const PRODUCTS = [
     ratingStars: '★★★★★', ratingText: '4.9 – 87 Bewertungen',
     newPrice: 12.99, oldPrice: 19.99, uvp: 29.99, discountReal: '-35%', discountInflated: '-57%',
     desc: 'Auslaufsichere Edelstahl-Trinkflasche, 750ml, hält 12h kalt, mit graviertem Gymnasium-Georgianum-Wappen.',
-    stockLeft: 20, viewers: 9, timerStart: '08:15:30', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_bottle.jpg', weiss: 'photosold/white_bottle.jpg', rot: 'photosold/red_bottle.jpg', blau: 'photosold/blue_bottle.jpg', gruen: 'photosold/green_bottle.jpg' }
+    stockLeft: 20, viewers: 9, timerStart: '08:15:30', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_bottle.jpg', weiss: 'photos/white_bottle.jpg', rot: 'photos/red_bottle.jpg', blau: 'photos/blue_bottle.jpg', gruen: 'photos/green_bottle.jpg' }
   },
   {
     id: 'hose', name: 'GG Hildburghausen Jogginghose', emoji: '👖',
@@ -165,7 +165,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.5 – 178 Bewertungen',
     newPrice: 29.99, oldPrice: 49.99, uvp: 69.99, discountReal: '-40%', discountInflated: '-57%',
     desc: 'Bequeme Jogginghose mit elastischem Bund und gesticktem Gymnasium-Georgianum-Wappen. Perfekt für Schule und Freizeit.',
-    stockLeft: 10, viewers: 22, timerStart: '03:45:12', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_pants.jpg', weiss: 'photosold/white_pants.jpg', rot: 'photosold/red_pants.jpg', blau: 'photosold/blue_pants.jpg', gruen: 'photosold/green_pants.jpg' }
+    stockLeft: 10, viewers: 22, timerStart: '03:45:12', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_pants.jpg', weiss: 'photos/white_pants.jpg', rot: 'photos/red_pants.jpg', blau: 'photos/blue_pants.jpg', gruen: 'photos/green_pants.jpg' }
   },
   {
     id: 'hemd', name: 'GG Hildburghausen Flanell-Hemd', emoji: '👔',
@@ -173,7 +173,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.4 – 96 Bewertungen',
     newPrice: 34.99, oldPrice: 54.99, uvp: 74.99, discountReal: '-36%', discountInflated: '-53%',
     desc: 'Kariertes Flanell-Hemd aus weicher Baumwolle mit kleinem Gymnasium-Georgianum-Wappen auf der Brust. Lässig und vielseitig kombinierbar.',
-    stockLeft: 9, viewers: 15, timerStart: '05:33:47', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_hemd.jpg', weiss: 'photosold/white_hemd.jpg', rot: 'photosold/red_hemd.jpg', blau: 'photosold/blue_hemd.jpg', gruen: 'photosold/green_hemd.jpg' }
+    stockLeft: 9, viewers: 15, timerStart: '05:33:47', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_hemd.jpg', weiss: 'photos/white_hemd.jpg', rot: 'photos/red_hemd.jpg', blau: 'photos/blue_hemd.jpg', gruen: 'photos/green_hemd.jpg' }
   },
   {
     id: 'cargohose', name: 'GG Hildburghausen Cargo-Hose', emoji: '👖',
@@ -181,7 +181,7 @@ const PRODUCTS = [
     ratingStars: '★★★★★', ratingText: '4.6 – 241 Bewertungen',
     newPrice: 39.99, oldPrice: 64.99, uvp: 89.99, discountReal: '-38%', discountInflated: '-56%',
     desc: 'Robuste Cargo-Hose mit praktischen Seitentaschen und aufgesticktem Gymnasium-Georgianum-Wappen. Der Streetwear-Klassiker.',
-    stockLeft: 6, viewers: 38, timerStart: '01:12:39', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_cargos.jpg', weiss: 'photosold/white_cargos.jpg', rot: 'photosold/red_cargos.jpg', blau: 'photosold/blue_cargos.jpg', gruen: 'photosold/green_cargos.jpg' }
+    stockLeft: 6, viewers: 38, timerStart: '01:12:39', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_cargos.jpg', weiss: 'photos/white_cargos.jpg', rot: 'photos/red_cargos.jpg', blau: 'photos/blue_cargos.jpg', gruen: 'photos/green_cargos.jpg' }
   },
   {
     id: 'sweatshirt', name: 'GG Hildburghausen Sweatshirt', emoji: '👚',
@@ -189,7 +189,7 @@ const PRODUCTS = [
     ratingStars: '★★★★★', ratingText: '4.7 – 289 Bewertungen',
     newPrice: 29.99, oldPrice: 49.99, uvp: 69.99, discountReal: '-40%', discountInflated: '-57%',
     desc: 'Klassisches Rundhals-Sweatshirt mit gesticktem Gymnasium-Georgianum-Wappen. Schwerer Baumwoll-Fleece, angenehm warm.',
-    stockLeft: 11, viewers: 27, timerStart: '02:33:19', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_sweater.jpg', weiss: 'photosold/white_sweater.jpg', rot: 'photosold/red_sweater.jpg', blau: 'photosold/blue_sweater.jpg', gruen: 'photosold/green_sweater.jpg' }
+    stockLeft: 11, viewers: 27, timerStart: '02:33:19', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_sweater.jpg', weiss: 'photos/white_sweater.jpg', rot: 'photos/red_sweater.jpg', blau: 'photos/blue_sweater.jpg', gruen: 'photos/green_sweater.jpg' }
   },
   {
     id: 'collegesweat', name: 'GG Hildburghausen Collegiate Sweatshirt', emoji: '👚',
@@ -197,7 +197,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.6 – 58 Bewertungen',
     newPrice: 32.99, oldPrice: 54.99, uvp: 74.99, discountReal: '-40%', discountInflated: '-56%',
     desc: 'Collegiate-Style Rundhals-Sweatshirt mit großem "GYMNASIUM GEORGIANUM"-Schriftzug und GG-Wappen auf der Brust. Im klassischen College-Look.',
-    stockLeft: 9, viewers: 19, timerStart: '04:47:52', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_collegesweat.jpg', weiss: 'photosold/white_collegesweat.jpg', rot: 'photosold/red_collegesweat.jpg', blau: 'photosold/blue_collegesweat.jpg', gruen: 'photosold/green_collegesweat.jpg' }
+    stockLeft: 9, viewers: 19, timerStart: '04:47:52', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_collegesweat.jpg', weiss: 'photos/white_collegesweat.jpg', rot: 'photos/red_collegesweat.jpg', blau: 'photos/blue_collegesweat.jpg', gruen: 'photos/green_collegesweat.jpg' }
   },
   {
     id: 'turnbeutel', name: 'GG Hildburghausen Sporttasche', emoji: '🎒',
@@ -205,7 +205,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.5 – 64 Bewertungen',
     newPrice: 24.99, oldPrice: 39.99, uvp: 54.99, discountReal: '-38%', discountInflated: '-55%',
     desc: 'Weekender-Sporttasche mit Tragegriffen, abnehmbarem Schultergurt und kleiner Fronttasche. Gymnasium-Georgianum-Wappen auf dem Hauptfach und der Fronttasche.',
-    stockLeft: 12, viewers: 8, timerStart: '09:02:10', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_pebag.jpg', weiss: 'photosold/white_pebag.jpg', rot: 'photosold/red_pebag.jpg', blau: 'photosold/blue_pebag.jpg', gruen: 'photosold/green_pebag.jpg' }
+    stockLeft: 12, viewers: 8, timerStart: '09:02:10', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_pebag.jpg', weiss: 'photos/white_pebag.jpg', rot: 'photos/red_pebag.jpg', blau: 'photos/blue_pebag.jpg', gruen: 'photos/green_pebag.jpg' }
   },
   {
     id: 'jutebeutel', name: 'GG Hildburghausen Jutebeutel', emoji: '👜',
@@ -213,7 +213,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.6 – 41 Bewertungen',
     newPrice: 6.99, oldPrice: 11.99, uvp: 16.99, discountReal: '-42%', discountInflated: '-59%',
     desc: 'Stabiler Jute-Stoffbeutel mit Gymnasium-Georgianum-Wappen. Praktisch für Bücher, Einkauf oder als Schultasche für unterwegs.',
-    stockLeft: 30, viewers: 6, timerStart: '10:15:44', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_bag.jpg', weiss: 'photosold/white_bag.jpg', rot: 'photosold/red_bag.jpg', blau: 'photosold/blue_bag.jpg', gruen: 'photosold/green_bag.jpg' }
+    stockLeft: 30, viewers: 6, timerStart: '10:15:44', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_bag.jpg', weiss: 'photos/white_bag.jpg', rot: 'photos/red_bag.jpg', blau: 'photos/blue_bag.jpg', gruen: 'photos/green_bag.jpg' }
   },
   {
     id: 'tasse', name: 'GG Hildburghausen Kaffeetasse', emoji: '☕',
@@ -221,7 +221,7 @@ const PRODUCTS = [
     ratingStars: '★★★★★', ratingText: '4.8 – 156 Bewertungen',
     newPrice: 9.99, oldPrice: 15.99, uvp: 21.99, discountReal: '-38%', discountInflated: '-55%',
     desc: 'Klassische Keramiktasse (300ml) mit Gymnasium-Georgianum-Wappen. Spülmaschinen- und mikrowellenfest.',
-    stockLeft: 18, viewers: 14, timerStart: '04:48:52', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_cup.jpg', weiss: 'photosold/white_cup.jpg', rot: 'photosold/red_cup.jpg', blau: 'photosold/blue_cup.jpg', gruen: 'photosold/green_cup.jpg' }
+    stockLeft: 18, viewers: 14, timerStart: '04:48:52', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_cup.jpg', weiss: 'photos/white_cup.jpg', rot: 'photos/red_cup.jpg', blau: 'photos/blue_cup.jpg', gruen: 'photos/green_cup.jpg' }
   },
   {
     id: 'thermobecher', name: 'GG Hildburghausen Thermobecher', emoji: '🥤',
@@ -229,7 +229,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.6 – 52 Bewertungen',
     newPrice: 16.99, oldPrice: 27.99, uvp: 39.99, discountReal: '-39%', discountInflated: '-58%',
     desc: 'Doppelwandiger Thermobecher (350ml) mit Gymnasium-Georgianum-Wappen, hält Getränke bis zu 6h warm.',
-    stockLeft: 14, viewers: 11, timerStart: '06:27:36', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_isobecher.jpg', weiss: 'photosold/white_isobecher.jpg', rot: 'photosold/red_isobecher.jpg', blau: 'photosold/blue_isobecher.jpg', gruen: 'photosold/green_isobecher.jpg' }
+    stockLeft: 14, viewers: 11, timerStart: '06:27:36', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_isobecher.jpg', weiss: 'photos/white_isobecher.jpg', rot: 'photos/red_isobecher.jpg', blau: 'photos/blue_isobecher.jpg', gruen: 'photos/green_isobecher.jpg' }
   },
   {
     id: 'notizbuch', name: 'GG Hildburghausen Notizbuch', emoji: '📓',
@@ -237,7 +237,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.4 – 73 Bewertungen',
     newPrice: 7.99, oldPrice: 12.99, uvp: 17.99, discountReal: '-38%', discountInflated: '-56%',
     desc: 'Hardcover-Notizbuch (A5, liniert) mit geprägtem Gymnasium-Georgianum-Wappen auf dem Einband. 120 Seiten.',
-    stockLeft: 22, viewers: 5, timerStart: '11:03:27', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_notebook.jpg', weiss: 'photosold/white_notebook.jpg', rot: 'photosold/red_notebook.jpg', blau: 'photosold/blue_notebook.jpg', gruen: 'photosold/green_notebook.jpg' }
+    stockLeft: 22, viewers: 5, timerStart: '11:03:27', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_notebook.jpg', weiss: 'photos/white_notebook.jpg', rot: 'photos/red_notebook.jpg', blau: 'photos/blue_notebook.jpg', gruen: 'photos/green_notebook.jpg' }
   },
   {
     id: 'schluesselanhaenger', name: 'GG Hildburghausen Schlüsselanhänger', emoji: '🔑',
@@ -249,7 +249,7 @@ const PRODUCTS = [
     // Sonderfall: uneinheitliche Dateinamen (chain/keychain gemischt) und
     // KEIN eigenes Weiß-Foto vorhanden -> "metal" (silbern) als Ersatz für
     // Weiß, passt farblich am ehesten.
-    photos: { schwarz: 'photosold/black_chain.jpg', weiss: 'photosold/metal_keychain.jpg', rot: 'photosold/red_chain.jpg', blau: 'photosold/blue_keychain.jpg', gruen: 'photosold/green_chain.jpg' }
+    photos: { schwarz: 'photos/black_chain.jpg', weiss: 'photos/metal_keychain.jpg', rot: 'photos/red_chain.jpg', blau: 'photos/blue_keychain.jpg', gruen: 'photos/green_chain.jpg' }
   },
   {
     id: 'beanie', name: 'GG Hildburghausen Beanie', emoji: '🧢',
@@ -257,7 +257,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.5 – 47 Bewertungen',
     newPrice: 12.99, oldPrice: 19.99, uvp: 27.99, discountReal: '-35%', discountInflated: '-54%',
     desc: 'Warme Strickmütze mit gesticktem Gymnasium-Georgianum-Wappen. One Size, für Herbst & Winter.',
-    stockLeft: 16, viewers: 9, timerStart: '03:59:14', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_beanie.jpg', weiss: 'photosold/white_beanie.jpg', rot: 'photosold/red_beanie.jpg', blau: 'photosold/blue_beanie.jpg', gruen: 'photosold/green_beanie.jpg' }
+    stockLeft: 16, viewers: 9, timerStart: '03:59:14', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_beanie.jpg', weiss: 'photos/white_beanie.jpg', rot: 'photos/red_beanie.jpg', blau: 'photos/blue_beanie.jpg', gruen: 'photos/green_beanie.jpg' }
   },
   {
     id: 'schal', name: 'GG Hildburghausen Schal', emoji: '🧣',
@@ -265,7 +265,7 @@ const PRODUCTS = [
     ratingStars: '★★★★☆', ratingText: '4.3 – 29 Bewertungen',
     newPrice: 14.99, oldPrice: 22.99, uvp: 31.99, discountReal: '-35%', discountInflated: '-53%',
     desc: 'Kuscheliger Strickschal mit eingewebtem Gymnasium-Georgianum-Wappen. Perfekt für den Schulweg im Winter.',
-    stockLeft: 13, viewers: 7, timerStart: '07:38:52', colors: ALL_COLOR_IDS, photos: { schwarz: 'photosold/black_scarf.jpg', weiss: 'photosold/white_scarf.jpg', rot: 'photosold/red_scarf.jpg', blau: 'photosold/blue_scarf.jpg', gruen: 'photosold/green_scarf.jpg' }
+    stockLeft: 13, viewers: 7, timerStart: '07:38:52', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_scarf.jpg', weiss: 'photos/white_scarf.jpg', rot: 'photos/red_scarf.jpg', blau: 'photos/blue_scarf.jpg', gruen: 'photos/green_scarf.jpg' }
   }
 ];
 
