@@ -141,7 +141,7 @@ const PRODUCTS = [
     ratingStars: '★★★★★', ratingText: '4.7 – 356 Bewertungen',
     newPrice: 34.99, oldPrice: 59.99, uvp: 79.99, discountReal: '-42%', discountInflated: '-56%',
     desc: 'Kuscheliger Hoodie mit gesticktem Gymnasium-Georgianum-Wappen. Unisex-Schnitt.',
-    stockLeft: 7, viewers: 41, timerStart: '01:58:27', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_hodie.jpg', weiss: 'photos/white_hoodie.jpg', rot: 'photos/red_hoodie.jpg', blau: 'photos/blue_hoodie.jpg', gruen: 'photos/green_hoodie.jpg' }
+    stockLeft: 7, viewers: 41, timerStart: '01:58:27', colors: ALL_COLOR_IDS, photos: { schwarz: 'photos/black_hoodie.jpg', weiss: 'photos/white_hoodie.jpg', rot: 'photos/red_hoodie.jpg', blau: 'photos/blue_hoodie.jpg', gruen: 'photos/green_hoodie.jpg' }
   },
   {
     id: 'cap', name: 'GG Hildburghausen Cap', emoji: '🧢',
